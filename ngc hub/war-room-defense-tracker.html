@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alliance Defense Tracker</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d4a2b 50%, #1a1a1a 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 10px,
+          rgba(45, 74, 43, 0.03) 10px,
+          rgba(45, 74, 43, 0.03) 20px
+        );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(30, 40, 30, 0.95);
+      border-radius: 0;
+      border: 3px solid #4a6b47;
+      box-shadow: 
+        0 0 30px rgba(74, 107, 71, 0.5),
+        inset 0 0 20px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      position: relative;
+      z-index: 2;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, 
+        #4a6b47 0%, 
+        #7fa87a 25%, 
+        #4a6b47 50%, 
+        #7fa87a 75%, 
+        #4a6b47 100%
+      );
+    }
+
+    .header {
+      background: linear-gradient(135deg, #2d4a2b 0%, #1a2e1a 100%);
+      color: #a8d5a3;
+      padding: 30px;
+      text-align: center;
+      border-bottom: 3px solid #4a6b47;
+      position: relative;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        #7fa87a 50%, 
+        transparent 100%
+      );
+    }
+
+    .ngc-logo {
+      font-size: 3em;
+      font-weight: bold;
+      color: #7fa87a;
+      text-shadow: 
+        0 0 10px rgba(127, 168, 122, 0.8),
+        2px 2px 4px rgba(0, 0, 0, 0.8);
+      margin-bottom: 5px;
+      letter-spacing: 8px;
+    }
+
+    .header h1 {
+      font-size: 1.8em;
+      margin-bottom: 5px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+      color: #c4e3bf;
+      letter-spacing: 3px;
+    }
+
+    .header p { 
+      opacity: 0.9; 
+      font-size: 1em;
+      color: #a8d5a3;
+      letter-spacing: 1px;
+    }
+
+    .tactical-line {
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        #4a6b47 10%, 
+        #7fa87a 50%, 
+        #4a6b47 90%, 
+        transparent 100%
+      );
+      margin: 15px 0;
+    }
+
+    .content { padding: 30px; }
+
+    .input-section {
+      background: linear-gradient(135deg, #2d4a2b 0%, #3d5a3b 100%);
+      border: 2px solid #4a6b47;
+      border-radius: 0;
+      padding: 30px;
+      margin-bottom: 30px;
+      color: #c4e3bf;
+      box-shadow: 
+        inset 0 0 20px rgba(0, 0, 0, 0.3),
+        0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .sync-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid #4a6b47;
+      margin-bottom: 20px;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .sync-status.synced { 
+      background: rgba(74, 107, 71, 0.3);
+      border-color: #7fa87a;
+      color: #a8d5a3;
+    }
+
+    .input-group { margin-bottom: 25px; }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+      font-size: 1.1em;
+      color: #a8d5a3;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .input-group input[type="text"],
+    .input-group input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #4a6b47;
+      background: rgba(0, 0, 0, 0.4);
+      color: #c4e3bf;
+      border-radius: 0;
+      font-size: 1.1em;
+      font-family: 'Courier New', monospace;
+    }
+
+    .input-group input[type="text"]:focus,
+    .input-group input[type="password"]:focus {
+      outline: none;
+      border-color: #7fa87a;
+      box-shadow: 0 0 10px rgba(127, 168, 122, 0.3);
+    }
+
+    .squad-section {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid #4a6b47;
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .squad-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, #4a6b47 0%, #7fa87a 50%, #4a6b47 100%);
+    }
+
+    .squad-title {
+      font-size: 1.3em;
+      font-weight: bold;
+      margin-bottom: 25px;
+      margin-left: 15px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #7fa87a;
+      text-shadow: 0 0 5px rgba(127, 168, 122, 0.5);
+    }
+
+    .wheels-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 3px;
+      margin-bottom: 10px;
+      margin-top: 10px;
+    }
+
+    .wheel-wrapper {
+      position: relative;
+      width: 50px;
+      height: 50px;
+      perspective: 600px;
+      overflow: hidden;
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .wheel:active { cursor: grabbing; }
+
+    .wheel-cylinder {
+      position: absolute;
+      width: 100%;
+      height: 30px;
+      top: 50%;
+      left: 50%;
+      transform-style: preserve-3d;
+      transform: translate(-50%, -50%);
+      transition: transform 0.2s ease-out;
+    }
+
+    .wheel-face {
+      position: absolute;
+      width: 100%;
+      height: 30px;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #a8d5a3;
+      background: linear-gradient(135deg, #2d4a2b 0%, #1a2e1a 100%);
+      border: 2px solid #4a6b47;
+      backface-visibility: hidden;
+      font-family: 'Courier New', monospace;
+    }
+
+    .separator {
+      font-size: 2em;
+      font-weight: bold;
+      color: #7fa87a;
+      margin: 0 5px;
+      align-self: center;
+      text-shadow: 0 0 5px rgba(127, 168, 122, 0.5);
+    }
+
+    .power-display {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 1.5em;
+      font-weight: bold;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px;
+      border: 1px solid #4a6b47;
+      color: #a8d5a3;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+    }
+
+    .btn {
+      padding: 15px 30px;
+      border: 2px solid #4a6b47;
+      border-radius: 0;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin: 10px 5px;
+      width: 100%;
+      font-family: 'Courier New', monospace;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4a6b47 0%, #5a7b57 100%);
+      color: #c4e3bf;
+      box-shadow: 0 5px 15px rgba(74, 107, 71, 0.3);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #5a7b57 0%, #6a8b67 100%);
+      box-shadow: 0 8px 20px rgba(74, 107, 71, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .alert {
+      padding: 15px;
+      margin: 15px 0;
+      display: none;
+      border: 2px solid;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+    }
+
+    .alert-success {
+      background: rgba(74, 107, 71, 0.3);
+      color: #a8d5a3;
+      border-color: #7fa87a;
+    }
+
+    .alert-error {
+      background: rgba(107, 71, 71, 0.3);
+      color: #d5a3a3;
+      border-color: #a87a7a;
+    }
+
+    .instruction {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 0.95em;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px;
+      border: 1px solid #4a6b47;
+      color: #a8d5a3;
+      font-family: 'Courier New', monospace;
+    }
+
+    @media (max-width: 768px) {
+      .ngc-logo { font-size: 2em; letter-spacing: 4px; }
+      .header h1 { font-size: 1.3em; }
+      .content { padding: 15px; }
+      .input-section { padding: 20px; }
+      .squad-title { margin-bottom: 20px; font-size: 1.1em; }
+      .wheel-wrapper { width: 45px; height: 45px; }
+      .wheel-cylinder { height: 28px; }
+      .wheel-face { height: 28px; font-size: 1.1em; }
+      .separator { font-size: 1.6em; margin: 0 3px; }
+      .wheels-container { margin-top: 8px; margin-bottom: 8px; }
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="ngc-logo">ALLIANCE</div>
+      <h1>DEFENSE TRACKER</h1>
+      <div class="tactical-line"></div>
+      <p>Tactical Squad Power Monitoring System</p>
+    </div>
+
+    <div class="content">
+      <div class="input-section">
+        <div class="sync-status synced">
+          <span>✅</span>
+          <span id="syncText">CONNECTED TO DATABASE</span>
+        </div>
+
+        <h2 style="margin-bottom: 15px; text-align: center; color: #7fa87a; letter-spacing: 3px;">⚙️ REPORT SQUAD POWER</h2>
+        <div class="instruction">💡 Drag wheels up/down or use mouse wheel • Names saved in UPPERCASE</div>
+
+        <div class="input-group">
+          <label for="memberName">OPERATIVE NAME:</label>
+          <input type="text" id="memberName" placeholder="Enter your in-game name" />
+        </div>
+
+        <div class="input-group">
+          <label for="secretCode">🔐 SECRET ACCESS CODE:</label>
+          <input type="password" id="secretCode" placeholder="Enter alliance secret code" />
+        </div>
+
+        <div class="squad-section">
+          <div class="squad-title">🚀 MISSILES</div>
+          <div class="wheels-container">
+            <div class="wheel-wrapper"><div class="wheel" data-squad="missiles" data-index="0"><div class="wheel-cylinder" id="cylinder-missiles-0"></div></div></div>
+            <div class="wheel-wrapper"><div class="wheel" data-squad="missiles" data-index="1"><div class="wheel-cylinder" id="cylinder-missiles-1"></div></div></div>
+            <div class="separator">,</div>
+            <div class="wheel-wrapper"><div class="wheel" data-squad="missiles" data-index="2"><div class="wheel-cylinder" id="cylinder-missiles-2"></div></div></div>
+            <div class="wheel-wrapper"><div class="wheel" data-squad="missiles" data-index="3"><div class="wheel-cylinder" id="cylinder-missiles-3"></div></div></div>
+          </div>
+          <div class="power-display" id="power-missiles">POWER: 00,00</div>
+        </div>
+
+        <div class="squad-section">
+          <div class="squad-title">✈️ AIRCRAFT</div>
+          <div class="wheels-container">
+            <div class="wheel-wrapper"><div class="wheel" data-squad="aircraft" data-index="0"><div class="wheel-cylinder" id="cylinder-aircraft-0"></div></div></div>
+            <div class="wheel-wrapper"><div class="wheel" data-squad="aircraft" data-index="1"><div class="wheel-cylinder" id="cylinder-aircraft-1"></div></div></div>
+            <div class="separator">,</div>
+            <div class="wheel-wrapper"><div class="wheel" data-squad="aircraft" data-index="2"><div class="wheel-cylinder" id="cylinder-aircraft-2"></div></div></div>
+            <div class="wheel-wrapper"><div class="wheel" data-squad="aircraft" data-index="3"><div class="wheel-cylinder" id="cylinder-aircraft-3"></div></div></div>
+          </div>
+          <div class="power-display" id="power-aircraft">POWER: 00,00</div>
+        </div>
+
+        <div class="squad-section">
+          <div class="squad-title">🚜 TANKS</div>
+          <div class="wheels-container">
+            <div class="wheel-wrapper"><div class="wheel" data-squad="tanks" data-index="0"><div class="wheel-cylinder" id="cylinder-tanks-0"></div></div></div>
+            <div class="wheel-wrapper"><div class="wheel" data-squad="tanks" data-index="1"><div class="wheel-cylinder" id="cylinder-tanks-1"></div></div></div>
+            <div class="separator">,</div>
+            <div class="wheel-wrapper"><div class="wheel" data-squad="tanks" data-index="2"><div class="wheel-cylinder" id="cylinder-tanks-2"></div></div></div>
+            <div class="wheel-wrapper"><div class="wheel" data-squad="tanks" data-index="3"><div class="wheel-cylinder" id="cylinder-tanks-3"></div></div></div>
+          </div>
+          <div class="power-display" id="power-tanks">POWER: 00,00</div>
+        </div>
+
+        <button class="btn btn-primary" id="submitBtn">💾 TRANSMIT TO DATABASE</button>
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ✅ AGGIORNATO CON IL TUO NUOVO DEPLOY URL!
+    const NGC_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxUh8QZSS776kD393oDBjSWbAksvV8Yop59T9JiwM44/dev';
+    
+    let allianceConfig = null;
+    let squadValues = {
+      missiles: [0,0,0,0],
+      aircraft: [0,0,0,0],
+      tanks: [0,0,0,0]
+    };
+    let wheelRotations = {};
+    let isSubmitting = false;
+
+    function todayISO() {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    async function saveToSheets(data) {
+      try {
+        const response = await fetch(NGC_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'add',
+            data: data
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+          return true;
+        } else {
+          console.error('Server error:', result.message);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error saving to database:', error);
+        return false;
+      }
+    }
+
+    // ✅ CARICA CONFIG ALLEANZA ALL'AVVIO
+    async function loadAllianceConfig() {
+      try {
+        const response = await fetch(`${NGC_SCRIPT_URL}?action=getConfig`);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          allianceConfig = data.data;
+          applyAllianceConfig();
+        }
+      } catch (error) {
+        console.error('Error loading alliance config:', error);
+        allianceConfig = {
+          alliance_name: 'Alliance',
+          primary_color: '#4a6b47'
+        };
+        applyAllianceConfig();
+      }
+    }
+
+    // Applica configurazione alleanza
+    function applyAllianceConfig() {
+      if (!allianceConfig) return;
+
+      // Aggiorna nome alleanza nel logo
+      const logoElement = document.querySelector('.ngc-logo');
+      if (logoElement) {
+        logoElement.textContent = allianceConfig.alliance_name.toUpperCase();
+      }
+
+      // Aggiorna testo connessione
+      const syncText = document.getElementById('syncText');
+      if (syncText) {
+        syncText.textContent = `CONNECTED TO ${allianceConfig.alliance_name.toUpperCase()} DATABASE`;
+      }
+
+      // Aggiorna pulsante
+      const submitBtn = document.getElementById('submitBtn');
+      if (submitBtn && !submitBtn.disabled) {
+        submitBtn.textContent = `💾 TRANSMIT TO ${allianceConfig.alliance_name.toUpperCase()} DATABASE`;
+      }
+
+      // Aggiorna titolo pagina
+      document.title = `${allianceConfig.alliance_name} - Defense Tracker`;
+    }
+
+    function initWheels() {
+      const squads = ["missiles","aircraft","tanks"];
+      const radius = 48;
+      
+      squads.forEach(squad => {
+        for (let i=0;i<4;i++) {
+          const cylinderId = `cylinder-${squad}-${i}`;
+          const cylinder = document.getElementById(cylinderId);
+          wheelRotations[cylinderId] = 0;
+
+          for (let num=0; num<10; num++) {
+            const face = document.createElement("div");
+            face.className = "wheel-face";
+            face.textContent = num;
+            const angle = (360/10)*num;
+            face.style.transform = `rotateX(${angle}deg) translateZ(${radius}px)`;
+            cylinder.appendChild(face);
+          }
+          updateWheelRotation(cylinder, 0);
+        }
+      });
+    }
+
+    function updateWheelRotation(cylinder, value) {
+      const angle = (360/10)*value;
+      cylinder.style.transform = `translate(-50%, -50%) rotateX(${-angle}deg)`;
+    }
+
+    function getWheelValue(rotation) {
+      let normalized = rotation % 360;
+      if (normalized < 0) normalized += 360;
+      const segment = 360/10;
+      return Math.round(normalized/segment) % 10;
+    }
+
+    function setupWheelInteractions() {
+      const wheels = document.querySelectorAll(".wheel");
+
+      wheels.forEach(wheel => {
+        const squad = wheel.dataset.squad;
+        const index = parseInt(wheel.dataset.index, 10);
+        const cylinder = wheel.querySelector(".wheel-cylinder");
+        const cylinderId = cylinder.id;
+
+        let isDragging = false;
+        let startY = 0;
+        let startRotation = 0;
+
+        wheel.addEventListener("mousedown", (e) => {
+          isDragging = true;
+          startY = e.clientY;
+          startRotation = wheelRotations[cylinderId] || 0;
+          e.preventDefault();
+        });
+
+        document.addEventListener("mousemove", (e) => {
+          if (!isDragging) return;
+          const deltaY = e.clientY - startY;
+          const rotationChange = deltaY * 0.8;
+          wheelRotations[cylinderId] = startRotation + rotationChange;
+          const value = getWheelValue(wheelRotations[cylinderId]);
+          squadValues[squad][index] = value;
+          updateWheelRotation(cylinder, value);
+          updatePowerDisplay(squad);
+        });
+
+        document.addEventListener("mouseup", () => {
+          if (!isDragging) return;
+          isDragging = false;
+          const value = getWheelValue(wheelRotations[cylinderId]);
+          wheelRotations[cylinderId] = value * (360/10);
+          updateWheelRotation(cylinder, value);
+        });
+
+        wheel.addEventListener("touchstart", (e) => {
+          isDragging = true;
+          startY = e.touches[0].clientY;
+          startRotation = wheelRotations[cylinderId] || 0;
+          e.preventDefault();
+        }, { passive: false });
+
+        wheel.addEventListener("touchmove", (e) => {
+          if (!isDragging) return;
+          const deltaY = e.touches[0].clientY - startY;
+          const rotationChange = deltaY * 0.8;
+          wheelRotations[cylinderId] = startRotation + rotationChange;
+          const value = getWheelValue(wheelRotations[cylinderId]);
+          squadValues[squad][index] = value;
+          updateWheelRotation(cylinder, value);
+          updatePowerDisplay(squad);
+          e.preventDefault();
+        }, { passive: false });
+
+        wheel.addEventListener("touchend", () => {
+          if (!isDragging) return;
+          isDragging = false;
+          const value = getWheelValue(wheelRotations[cylinderId]);
+          wheelRotations[cylinderId] = value * (360/10);
+          updateWheelRotation(cylinder, value);
+        });
+
+        wheel.addEventListener("wheel", (e) => {
+          e.preventDefault();
+          const delta = e.deltaY > 0 ? 1 : -1;
+          squadValues[squad][index] = (squadValues[squad][index] + delta + 10) % 10;
+          wheelRotations[cylinderId] = squadValues[squad][index] * (360/10);
+          updateWheelRotation(cylinder, squadValues[squad][index]);
+          updatePowerDisplay(squad);
+        }, { passive: false });
+      });
+    }
+
+    function updatePowerDisplay(squad) {
+      const v = squadValues[squad];
+      const str = `${v[0]}${v[1]},${v[2]}${v[3]}`;
+      document.getElementById(`power-${squad}`).textContent = `POWER: ${str}`;
+    }
+
+    function getPowerValue(squad) {
+      const v = squadValues[squad];
+      return parseInt(`${v[0]}${v[1]}${v[2]}${v[3]}`, 10);
+    }
+
+    function resetWheels() {
+      ["missiles","aircraft","tanks"].forEach(squad => {
+        squadValues[squad] = [0,0,0,0];
+        for (let i=0;i<4;i++) {
+          const cylinderId = `cylinder-${squad}-${i}`;
+          const cylinder = document.getElementById(cylinderId);
+          wheelRotations[cylinderId] = 0;
+          updateWheelRotation(cylinder, 0);
+        }
+        updatePowerDisplay(squad);
+      });
+    }
+
+    function showAlert(type, message) {
+      const success = document.getElementById("successAlert");
+      const error = document.getElementById("errorAlert");
+      success.style.display = "none";
+      error.style.display = "none";
+      const target = type === "success" ? success : error;
+      target.textContent = message;
+      target.style.display = "block";
+      setTimeout(() => target.style.display = "none", 4500);
+    }
+
+    document.getElementById("submitBtn").addEventListener("click", async () => {
+      if (isSubmitting) {
+        console.log("Already submitting, ignoring click");
+        return;
+      }
+
+      const nameInput = document.getElementById("memberName");
+      const secretCodeInput = document.getElementById("secretCode");
+      const submitBtn = document.getElementById("submitBtn");
+      
+      const nameOriginal = nameInput.value.trim();
+      const secretCode = secretCodeInput.value.trim();
+      
+      if (!nameOriginal) { showAlert("error","⚠️ OPERATIVE NAME REQUIRED!"); return; }
+      if (!secretCode) { showAlert("error","⚠️ SECRET CODE REQUIRED!"); return; }
+
+      const name = nameOriginal.toUpperCase();
+
+      isSubmitting = true;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "⏳ TRANSMITTING...";
+
+      const entry = {
+        name,
+        secretCode,
+        missiles: getPowerValue("missiles"),
+        aircraft: getPowerValue("aircraft"),
+        tanks: getPowerValue("tanks"),
+        dateISO: todayISO(),
+        createdAt: Date.now()
+      };
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const success = await saveToSheets(entry);
+      
+      setTimeout(() => {
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        const allianceName = allianceConfig ? allianceConfig.alliance_name.toUpperCase() : 'DATABASE';
+        submitBtn.textContent = `💾 TRANSMIT TO ${allianceName} DATABASE`;
+      }, 2000);
+      
+      if (success) {
+        showAlert("success", `✅ TRANSMISSION SUCCESSFUL - ${name} DATA LOGGED`);
+        nameInput.value = "";
+        secretCodeInput.value = "";
+        resetWheels();
+      } else {
+        showAlert("error", "❌ TRANSMISSION FAILED - CHECK CONNECTION OR INVALID CODE");
+      }
+    });
+
+    // Initialize on page load
+    initWheels();
+    setupWheelInteractions();
+    ["missiles","aircraft","tanks"].forEach(updatePowerDisplay);
+    loadAllianceConfig();
+  </script>
+
+</body>
+</html>
