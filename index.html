@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alliance Command Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+```
+    :root {
+        --primary-color: #4caf50;
+        --secondary-color: #8bc34a;
+        --accent-color: #76ff03;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+        color: #e0e0e0;
+        min-height: 100vh;
+        padding: 20px;
+        position: relative;
+    }
+
+    .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #1a2e1a;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    }
+
+    .loading-spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(76, 175, 80, 0.2);
+        border-top-color: var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+        margin-top: 20px;
+        font-size: 1.2em;
+        color: var(--primary-color);
+    }
+
+    .main-content {
+        display: none;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .main-content.loaded {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .language-selector {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 10px;
+        z-index: 100;
+    }
+
+    .lang-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        color: #e0e0e0;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .lang-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .lang-btn.active {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+    }
+
+    .announcement-banner {
+        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        border: 2px solid #ffb74d;
+        border-radius: 15px;
+        padding: 20px 30px;
+        margin-bottom: 30px;
+        position: relative;
+        box-shadow: 0 5px 20px rgba(255, 152, 0, 0.3);
+        display: none;
+    }
+
+    .announcement-banner.visible {
+        display: block;
+        animation: slideDown 0.5s ease;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .announcement-banner h3 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+        color: #1a1a1a;  /* ✅ Nero invece di bianco */
+        text-shadow: none;
+    }
+
+    .announcement-banner p {
+        font-size: 1.1em;
+        line-height: 1.6;
+        color: #2d2d2d;  /* ✅ Grigio scuro invece di bianco */
+        text-shadow: none;
+    }
+
+    .announcement-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(0, 0, 0, 0.15);  /* ✅ Meno trasparente */
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        color: #1a1a1a;  /* ✅ Nero invece di bianco */
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.2em;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .announcement-close:hover {
+        background: rgba(0, 0, 0, 0.3);
+        transform: rotate(90deg);
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 60px;
+        margin-top: 60px;
+    }
+
+    .alliance-logo {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 20px;
+        display: none;
+    }
+
+    .alliance-logo.visible {
+        display: block;
+    }
+
+    .alliance-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 0 20px var(--primary-color));
+    }
+
+    .header h1 {
+        font-size: 3.5em;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 50%, var(--secondary-color) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px rgba(118, 255, 3, 0.3);
+        margin-bottom: 15px;
+        letter-spacing: 2px;
+    }
+
+    .header .subtitle {
+        font-size: 1.3em;
+        color: #b0b0b0;
+        font-weight: 300;
+        letter-spacing: 1px;
+    }
+
+    .header .alliance-tag {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 25px;
+        background: rgba(76, 175, 80, 0.2);
+        border: 2px solid var(--primary-color);
+        border-radius: 25px;
+        font-weight: 700;
+        font-size: 1.1em;
+        color: var(--accent-color);
+        letter-spacing: 3px;
+        cursor: default;
+        transition: all 0.3s ease;
+        user-select: none;
+    }
+
+    .cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    .card-link {
+        display: block;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .command-card {
+        background: rgba(30, 50, 30, 0.8);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 40px;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+    }
+
+    .command-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .card-link:hover .command-card::before {
+        opacity: 1;
+    }
+
+    .card-link:hover .command-card {
+        transform: translateY(-10px);
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-icon {
+        font-size: 4em;
+        margin-bottom: 20px;
+        filter: drop-shadow(0 0 20px currentColor);
+    }
+
+    .card-title {
+        font-size: 2em;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: #ffffff;
+    }
+
+    .card-description {
+        font-size: 1.1em;
+        color: #b0b0b0;
+        line-height: 1.6;
+        margin-bottom: 25px;
+    }
+
+    .card-lock {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 1.5em;
+        color: #ffb74d;
+    }
+
+    .card-button {
+        display: inline-block;
+        padding: 12px 30px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .card-button:hover {
+        border-color: var(--accent-color);
+        box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+    }
+
+    .personal-stats-card {
+        border-color: rgba(139, 195, 74, 0.3);
+    }
+
+    .card-link:hover .personal-stats-card {
+        border-color: #8bc34a;
+        box-shadow: 0 20px 60px rgba(139, 195, 74, 0.3);
+    }
+
+    .personal-stats-card .card-icon {
+        color: #8bc34a;
+    }
+
+    .war-room-card {
+        border-color: rgba(104, 159, 56, 0.3);
+    }
+
+    .card-link:hover .war-room-card {
+        border-color: #689f38;
+        box-shadow: 0 20px 60px rgba(104, 159, 56, 0.3);
+    }
+
+    .war-room-card .card-icon {
+        color: #689f38;
+    }
+
+    .canyon-card {
+        border-color: rgba(141, 110, 99, 0.3);
+    }
+
+    .card-link:hover .canyon-card {
+        border-color: #8d6e63;
+        box-shadow: 0 20px 60px rgba(141, 110, 99, 0.3);
+    }
+
+    .canyon-card .card-icon {
+        color: #bcaaa4;
+    }
+
+    .storm-card {
+        border-color: rgba(255, 152, 0, 0.3);
+    }
+
+    .card-link:hover .storm-card {
+        border-color: #ff9800;
+        box-shadow: 0 20px 60px rgba(255, 152, 0, 0.3);
+    }
+
+    .storm-card .card-icon {
+        color: #ff9800;
+    }
+
+    .r4-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        backdrop-filter: blur(5px);
+    }
+
+    .r4-modal.visible {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .r4-modal-content {
+        background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+        border: 3px solid var(--primary-color);
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(50px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .r4-modal h2 {
+        color: var(--accent-color);
+        margin-bottom: 20px;
+        font-size: 1.8em;
+    }
+
+    .r4-modal p {
+        color: #b0b0b0;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .r4-modal input {
+        width: 100%;
+        padding: 15px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid var(--primary-color);
+        border-radius: 10px;
+        color: #e0e0e0;
+        font-size: 1.1em;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+    }
+
+    .r4-modal input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 15px rgba(118, 255, 3, 0.3);
+    }
+
+    .r4-modal-buttons {
+        display: flex;
+        gap: 15px;
+    }
+
+    .r4-modal button {
+        flex: 1;
+        padding: 15px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .r4-btn-confirm {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+    }
+
+    .r4-btn-confirm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+    }
+
+    .r4-btn-cancel {
+        background: rgba(244, 67, 54, 0.2);
+        border: 2px solid #f44336;
+        color: #ff6b6b;
+    }
+
+    .r4-btn-cancel:hover {
+        background: rgba(244, 67, 54, 0.4);
+    }
+
+    .footer {
+        text-align: center;
+        margin-top: 60px;
+        padding: 20px;
+        color: #808080;
+        font-size: 0.9em;
+    }
+
+    .footer-links {
+        margin-top: 10px;
+    }
+
+    .footer-links a {
+        color: var(--primary-color);
+        text-decoration: none;
+        margin: 0 10px;
+        transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+        color: var(--accent-color);
+    }
+
+    @media (max-width: 768px) {
+        .header h1 {
+            font-size: 2.5em;
+        }
+
+        .cards-container {
+            grid-template-columns: 1fr;
+        }
+
+        .language-selector {
+            position: static;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" data-translate="loading">Caricamento...</div>
+    </div>
+
+```
+<div class="r4-modal" id="r4Modal">
+    <div class="r4-modal-content">
+        <h2>🔒 <span data-translate="r4Title">Accesso Ristretto R4</span></h2>
+        <p data-translate="r4Description">Questa sezione è riservata ai leader dell'alleanza. Inserisci il codice R4 per continuare.</p>
+        <input type="password" id="r4CodeInput" placeholder="Inserisci Codice R4" maxlength="20">
+        <div class="r4-modal-buttons">
+            <button class="r4-btn-confirm" onclick="verifyR4Code()" data-translate="r4Confirm">Accedi</button>
+            <button class="r4-btn-cancel" onclick="closeR4Modal()" data-translate="r4Cancel">Annulla</button>
+        </div>
+    </div>
+</div>
+
+<div class="main-content" id="mainContent">
+    <div class="language-selector">
+        <button class="lang-btn active" data-lang="it" onclick="changeLanguage('it')">🇮🇹 IT</button>
+        <button class="lang-btn" data-lang="en" onclick="changeLanguage('en')">🇬🇧 EN</button>
+        <button class="lang-btn" data-lang="fr" onclick="changeLanguage('fr')">🇫🇷 FR</button>
+    </div>
+
+    <div class="announcement-banner" id="announcementBanner">
+        <button class="announcement-close" onclick="closeAnnouncement()">✕</button>
+        <h3>⚠️ <span data-translate="announcementTitle">Avviso Importante</span></h3>
+        <p id="announcementText"></p>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="alliance-logo" id="allianceLogo">
+                <img src="" alt="Alliance Logo" id="logoImg">
+            </div>
+            <h1 id="allianceName">COMMAND CENTER</h1>
+            <div class="subtitle" data-translate="subtitle">Centro di Comando dell'Alleanza</div>
+            <div class="alliance-tag" id="serverTag">CARICAMENTO...</div>
+        </div>
+
+        <div class="cards-container" id="cardsContainer"></div>
+
+        <div class="footer">
+            <p id="footerText"></p>
+            <div class="footer-links" id="footerLinks"></div>
+            <p style="margin-top: 10px; font-size: 0.8em;">Alliance Hub v2.0</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxW7r1urLCNeU3XfR_2hZ2J4nXipgrM1i7bsMlSxuUC1Dpu0h8BRXlhsZggLG-ecvm24Q/exec';
+    
+    let currentConfig = null;
+    let currentLang = 'it';
+    let pendingR4App = null;
+
+    const translations = {
+        it: {
+            loading: 'Caricamento...',
+            subtitle: 'Centro di Comando dell\'Alleanza',
+            announcementTitle: 'Avviso Importante',
+            r4Title: 'Accesso Ristretto R4',
+            r4Description: 'Questa sezione è riservata ai leader dell\'alleanza. Inserisci il codice R4 per continuare.',
+            r4Confirm: 'Accedi',
+            r4Cancel: 'Annulla',
+            personalStatsTitle: 'Personal Stats',
+            personalStatsDesc: 'Visualizza le tue statistiche personali, trend di crescita e ranking nell\'alleanza.',
+            personalStatsBtn: 'Vedi Statistiche',
+            warRoomTitle: 'War Room',
+            warRoomDesc: 'Inserisci il potere delle tue squadre: Missili, Aerei e Tank.',
+            warRoomBtn: 'Vai al War Room',
+            canyonTitle: 'Strategy Manager',
+            canyonDesc: 'Pianifica e gestisci la strategia per i tornei Canyon e Desert Storm.',
+            canyonBtn: 'Apri Strategia',
+            footerContact: 'Contatti:',
+            r4ErrorTitle: 'Codice R4 Non Valido',
+            r4ErrorMsg: 'Il codice R4 inserito non è corretto. Riprova.',
+            errorTitle: 'Errore Caricamento',
+            errorMsg: 'Impossibile caricare la configurazione. Verifica il link.'
+        },
+        en: {
+            loading: 'Loading...',
+            subtitle: 'Alliance Command Center',
+            announcementTitle: 'Important Announcement',
+            r4Title: 'R4 Restricted Access',
+            r4Description: 'This section is reserved for alliance leaders. Enter the R4 code to continue.',
+            r4Confirm: 'Access',
+            r4Cancel: 'Cancel',
+            personalStatsTitle: 'Personal Stats',
+            personalStatsDesc: 'View your personal statistics, growth trends and alliance ranking.',
+            personalStatsBtn: 'View Stats',
+            warRoomTitle: 'War Room',
+            warRoomDesc: 'Enter your squad power: Missiles, Aircraft and Tanks.',
+            warRoomBtn: 'Go to War Room',
+            canyonTitle: 'Strategy Manager',
+            canyonDesc: 'Plan and manage the strategy for Canyon and Desert Storm tournaments.',
+            canyonBtn: 'Open Strategy',
+            footerContact: 'Contacts:',
+            r4ErrorTitle: 'Invalid R4 Code',
+            r4ErrorMsg: 'The R4 code entered is incorrect. Try again.',
+            errorTitle: 'Loading Error',
+            errorMsg: 'Unable to load configuration. Check the link.'
+        },
+        fr: {
+            loading: 'Chargement...',
+            subtitle: 'Centre de Commandement de l\'Alliance',
+            announcementTitle: 'Annonce Importante',
+            r4Title: 'Accès Restreint R4',
+            r4Description: 'Cette section est réservée aux leaders de l\'alliance. Entrez le code R4 pour continuer.',
+            r4Confirm: 'Accéder',
+            r4Cancel: 'Annuler',
+            personalStatsTitle: 'Statistiques Personnelles',
+            personalStatsDesc: 'Consultez vos statistiques personnelles, tendances de croissance et classement.',
+            personalStatsBtn: 'Voir Statistiques',
+            warRoomTitle: 'Salle de Guerre',
+            warRoomDesc: 'Entrez la puissance de vos escouades: Missiles, Avions et Tanks.',
+            warRoomBtn: 'Aller à la Salle',
+            canyonTitle: 'Gestionnaire de Stratégie',
+            canyonDesc: 'Planifiez et gérez la stratégie pour les tournois Canyon et Desert Storm.',
+            canyonBtn: 'Ouvrir Stratégie',
+            footerContact: 'Contacts:',
+            r4ErrorTitle: 'Code R4 Invalide',
+            r4ErrorMsg: 'Le code R4 entré est incorrect. Réessayez.',
+            errorTitle: 'Erreur de Chargement',
+            errorMsg: 'Impossible de charger la configuration. Vérifiez le lien.'
+        }
+    };
+
+    window.addEventListener('DOMContentLoaded', init);
+
+    async function init() {
+        try {
+            await loadConfig();
+            applyConfig();
+            renderCards();
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').classList.add('loaded');
+        } catch (error) {
+            console.error('Init error:', error);
+            showError();
+        }
+    }
+
+    async function loadConfig() {
+        try {
+            const response = await fetch(`${API_URL}?action=getConfig`);
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                currentConfig = data.data;
+                if (currentConfig.language) {
+                    currentLang = currentConfig.language;
+                }
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('Config load error:', error);
+            currentConfig = {
+                alliance_name: 'NGC',
+                server: '1105',
+                primary_color: '#4caf50',
+                secondary_color: '#8bc34a',
+                accent_color: '#76ff03',
+                logo_url: '',
+                language: 'it',
+                announcement: '',
+                announcement_color: '#ff9800',
+                show_announcement: 'false',
+                contact_discord: '',
+                contact_email: ''
+            };
+        }
+    }
+
+    function applyConfig() {
+        document.getElementById('allianceName').textContent = 
+            currentConfig.alliance_name.toUpperCase() + ' COMMAND CENTER';
+        
+        document.getElementById('serverTag').textContent = 
+            'SERVER ' + currentConfig.server;
+        
+        document.documentElement.style.setProperty('--primary-color', currentConfig.primary_color);
+        document.documentElement.style.setProperty('--secondary-color', currentConfig.secondary_color);
+        document.documentElement.style.setProperty('--accent-color', currentConfig.accent_color);
+        
+        if (currentConfig.logo_url && currentConfig.logo_url.trim() !== '') {
+            const logoDiv = document.getElementById('allianceLogo');
+            const logoImg = document.getElementById('logoImg');
+            logoImg.src = currentConfig.logo_url;
+            logoDiv.classList.add('visible');
+        }
+        
+        if (currentConfig.show_announcement === 'true' && currentConfig.announcement) {
+            const banner = document.getElementById('announcementBanner');
+            const text = document.getElementById('announcementText');
+            text.textContent = currentConfig.announcement;
+            banner.style.background = `linear-gradient(135deg, ${currentConfig.announcement_color} 0%, ${adjustColor(currentConfig.announcement_color, -20)} 100%)`;
+            banner.classList.add('visible');
+        }
+        
+        let footerText = '';
+        if (currentConfig.contact_email || currentConfig.contact_discord) {
+            footerText = translations[currentLang].footerContact + ' ';
+        }
+        document.getElementById('footerText').textContent = footerText;
+        
+        let footerLinks = '';
+        if (currentConfig.contact_discord) {
+            footerLinks += `<a href="${currentConfig.contact_discord}" target="_blank">Discord</a>`;
+        }
+        if (currentConfig.contact_email) {
+            footerLinks += `<a href="mailto:${currentConfig.contact_email}">Email</a>`;
+        }
+        document.getElementById('footerLinks').innerHTML = footerLinks;
+        
+        applyTranslations();
+    }
+
+    function renderCards() {
+        const container = document.getElementById('cardsContainer');
+        const t = translations[currentLang];
+        
+        const cards = [
+            {
+                icon: '📊',
+                title: t.personalStatsTitle,
+                description: t.personalStatsDesc,
+                button: t.personalStatsBtn,
+                class: 'personal-stats-card',
+                locked: false,
+                app: 'ngc-personal-stats'
+            },
+            {
+                icon: '⚔️',
+                title: t.warRoomTitle,
+                description: t.warRoomDesc,
+                button: t.warRoomBtn,
+                class: 'war-room-card',
+                locked: false,
+                app: 'war-room-defense-tracker'
+            },
+            {
+                icon: '🗺️',  // ✅ Mappa generica per Strategy
+                title: t.canyonTitle,
+                description: t.canyonDesc,
+                button: t.canyonBtn,
+                class: 'canyon-card',
+                locked: true,
+                app: 'strategy'  // ✅ Link unificato
+            }
+        ];
+        
+        container.innerHTML = cards.map(card => `
+            <a class="card-link" onclick="openApp('${card.app}', ${card.locked}); return false;" href="#">
+                <div class="command-card ${card.class}">
+                    ${card.locked ? '<div class="card-lock">🔒</div>' : ''}
+                    <div class="card-icon">${card.icon}</div>
+                    <h2 class="card-title">${card.title}</h2>
+                    <p class="card-description">${card.description}</p>
+                    <div class="card-button">${card.button}</div>
+                </div>
+            </a>
+        `).join('');
+    }
+
+    function openApp(app, locked) {
+        if (locked) {
+            pendingR4App = app;
+            document.getElementById('r4Modal').classList.add('visible');
+            document.getElementById('r4CodeInput').value = '';
+            document.getElementById('r4CodeInput').focus();
+        } else {
+            window.location.href = `${app}.html`;
+        }
+    }
+
+    async function verifyR4Code() {
+        const code = document.getElementById('r4CodeInput').value.trim();
+        
+        if (!code) {
+            alert(translations[currentLang].r4ErrorMsg);
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${API_URL}?action=verifyR4Code&code=${encodeURIComponent(code)}`);
+            const data = await response.json();
+            
+            if (data.status === 'success' && data.data.valid) {
+                sessionStorage.setItem('r4Code', code);
+                // ✅ Unified strategy app - va sempre su alliance-strategy-ENHANCED.html
+                const url = 'alliance-strategy-ENHANCED.html';
+                window.location.href = url;
+            } else {
+                alert(translations[currentLang].r4ErrorMsg);
+                document.getElementById('r4CodeInput').value = '';
+                document.getElementById('r4CodeInput').focus();
+            }
+        } catch (error) {
+            console.error('R4 verification error:', error);
+            alert(translations[currentLang].r4ErrorMsg);
+        }
+    }
+
+    function closeR4Modal() {
+        document.getElementById('r4Modal').classList.remove('visible');
+        pendingR4App = null;
+    }
+
+    function closeAnnouncement() {
+        document.getElementById('announcementBanner').classList.remove('visible');
+    }
+
+    function changeLanguage(lang) {
+        currentLang = lang;
+        
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.lang === lang) {
+                btn.classList.add('active');
+            }
+        });
+        
+        applyTranslations();
+        renderCards();
+    }
+
+    function applyTranslations() {
+        const t = translations[currentLang];
+        
+        document.querySelectorAll('[data-translate]').forEach(el => {
+            const key = el.dataset.translate;
+            if (t[key]) {
+                el.textContent = t[key];
+            }
+        });
+        
+        const subtitle = document.querySelector('.subtitle');
+        if (subtitle) {
+            subtitle.textContent = t.subtitle;
+        }
+        
+        let footerText = '';
+        if (currentConfig.contact_email || currentConfig.contact_discord) {
+            footerText = t.footerContact + ' ';
+        }
+        document.getElementById('footerText').textContent = footerText;
+    }
+
+    function showError() {
+        const t = translations[currentLang];
+        document.getElementById('loadingScreen').innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <h2 style="color: #f44336; margin-bottom: 20px;">${t.errorTitle}</h2>
+                <p style="color: #b0b0b0;">${t.errorMsg}</p>
+            </div>
+        `;
+    }
+
+    function adjustColor(color, amount) {
+        const num = parseInt(color.replace('#', ''), 16);
+        const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+        const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
+        const b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
+        return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeR4Modal();
+        }
+        
+        if (e.key === 'Enter' && document.getElementById('r4Modal').classList.contains('visible')) {
+            verifyR4Code();
+        }
+    });
+</script>
+```
+
+</body>
+</html>
