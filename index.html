@@ -382,6 +382,15 @@
             color: #ff9800;
         }
 
+        .smorfia-card {
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+        .card-link:hover .smorfia-card {
+            border-color: #a855f7;
+            box-shadow: 0 20px 60px rgba(168, 85, 247, 0.3);
+        }
+        .smorfia-card .card-icon { color: #c084fc; }
+
         .r4-modal {
             position: fixed;
             top: 0;
@@ -600,6 +609,9 @@
                 canyonTitle: 'Strategy Manager',
                 canyonDesc: 'Pianifica e gestisci la strategia per i tornei Canyon e Desert Storm.',
                 canyonBtn: 'Apri Strategia',
+                smorfiaTitle: 'Lotteria NGC',
+                smorfiaDesc: 'Gioca 5 numeri + jolly ogni settimana. Chi indovina di più diventa il Culone della Settimana!',
+                smorfiaBtn: 'Gioca Ora',
                 footerContact: 'Contatti:',
                 r4ErrorTitle: 'Codice R4 Non Valido',
                 r4ErrorMsg: 'Il codice R4 inserito non è corretto. Riprova.',
@@ -623,6 +635,9 @@
                 canyonTitle: 'Strategy Manager',
                 canyonDesc: 'Plan and manage the strategy for Canyon and Desert Storm tournaments.',
                 canyonBtn: 'Open Strategy',
+                smorfiaTitle: 'Lotteria NGC',
+                smorfiaDesc: 'Pick 5 numbers + jolly every week. Best combo wins the Butt of the Week title!',
+                smorfiaBtn: 'Play Now',
                 footerContact: 'Contacts:',
                 r4ErrorTitle: 'Invalid R4 Code',
                 r4ErrorMsg: 'The R4 code entered is incorrect. Try again.',
@@ -646,6 +661,9 @@
                 canyonTitle: 'Gestionnaire de Stratégie',
                 canyonDesc: 'Planifiez et gérez la stratégie pour les tournois Canyon et Desert Storm.',
                 canyonBtn: 'Ouvrir Stratégie',
+                smorfiaTitle: 'Lotteria NGC',
+                smorfiaDesc: 'Joue 5 numéros + joker chaque semaine. Le meilleur gagne le titre de Gros Derrière!',
+                smorfiaBtn: 'Jouer Maintenant',
                 footerContact: 'Contacts:',
                 r4ErrorTitle: 'Code R4 Invalide',
                 r4ErrorMsg: 'Le code R4 entré est incorrect. Réessayez.',
@@ -669,6 +687,9 @@
                 canyonTitle: 'Strategie-Manager',
                 canyonDesc: 'Planen und verwalten Sie die Strategie für Canyon- und Desert Storm-Turniere.',
                 canyonBtn: 'Strategie öffnen',
+                smorfiaTitle: 'Lotteria NGC',
+                smorfiaDesc: 'Tippe jede Woche 5 Zahlen + Joker. Die beste Kombination gewinnt den Hintern der Woche!',
+                smorfiaBtn: 'Jetzt Spielen',
                 footerContact: 'Kontakte:',
                 r4ErrorTitle: 'Ungültiger R4-Code',
                 r4ErrorMsg: 'Der eingegebene R4-Code ist falsch. Versuchen Sie es erneut.',
@@ -808,6 +829,15 @@
                     class: 'canyon-card',
                     locked: true,
                     app: 'strategy'  // ✅ Link unificato
+                },
+                {
+                    icon: '🎰',
+                    title: t.smorfiaTitle,
+                    description: t.smorfiaDesc,
+                    button: t.smorfiaBtn,
+                    class: 'smorfia-card',
+                    locked: false,
+                    app: 'smorfia-game'
                 }
             ];
             

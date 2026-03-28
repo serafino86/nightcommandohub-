@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<!--
+  NGC Lotteria NGC
+  Copyright (c) 2025 Serafino — serafino.ngc@gmail.com
+-->
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lotteria NGC 🎰</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
+
+    :root {
+      --red:    #ff3b6b;
+      --yellow: #ffd93d;
+      --purple: #a855f7;
+      --blue:   #3b82f6;
+      --green:  #22c55e;
+      --orange: #f97316;
+      --pink:   #ec4899;
+      --bg:     #0d0d1a;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #fff;
+    }
+
+    /* ── ANIMATED BG ── */
+    .bg-stars {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(168,85,247,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(59,130,246,0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(255,59,107,0.08) 0%, transparent 70%);
+    }
+
+    .floating-emoji {
+      position: fixed; font-size: 2rem; opacity: 0.12; pointer-events: none; z-index: 0;
+      animation: floatUp linear infinite;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(100vh) rotate(0deg);   opacity: 0; }
+      10%  { opacity: 0.15; }
+      90%  { opacity: 0.15; }
+      100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* ── CONTAINER ── */
+    .wrap { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 16px; }
+
+    /* ── BACK BTN ── */
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.2);
+      color: #fff; padding: 7px 16px; border-radius: 999px; font-size: 0.85em;
+      font-weight: 700; text-decoration: none; transition: all 0.2s; margin-bottom: 16px;
+      font-family: 'Nunito', sans-serif;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.15); transform: translateX(-3px); }
+
+    /* ── LANG BAR ── */
+    .lang-bar { display: flex; gap: 6px; margin-bottom: 16px; justify-content: flex-end; }
+    .lang-btn {
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.7); padding: 4px 10px; border-radius: 6px;
+      font-size: 0.78em; font-weight: 700; cursor: pointer; transition: all 0.2s;
+      font-family: 'Nunito', sans-serif;
+    }
+    .lang-btn.active, .lang-btn:hover { background: var(--purple); border-color: var(--purple); color: #fff; }
+
+    .top-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+
+    /* ── HEADER ── */
+    .header { text-align: center; margin-bottom: 28px; }
+    .header-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--red), var(--purple));
+      padding: 4px 18px; border-radius: 999px; font-size: 0.78em; font-weight: 900;
+      letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px;
+      box-shadow: 0 4px 20px rgba(255,59,107,0.4);
+    }
+    .header h1 {
+      font-family: 'Fredoka One', sans-serif;
+      font-size: clamp(2.2em, 8vw, 4em);
+      background: linear-gradient(135deg, var(--yellow) 0%, var(--orange) 40%, var(--red) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 0 20px rgba(255,211,61,0.4));
+      animation: titlePulse 3s ease-in-out infinite;
+    }
+    @keyframes titlePulse {
+      0%,100% { filter: drop-shadow(0 0 20px rgba(255,211,61,0.3)); }
+      50%      { filter: drop-shadow(0 0 35px rgba(255,211,61,0.6)); }
+    }
+    .header .sub { font-size: 0.95em; color: rgba(255,255,255,0.55); margin-top: 4px; }
+
+    /* ── CARDS ── */
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.3s;
+    }
+    .card-title {
+      font-family: 'Fredoka One', sans-serif;
+      font-size: 1.2em; margin-bottom: 18px; display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ── DRAW SECTION ── */
+    .countdown-box { text-align: center; padding: 20px 0; }
+    .countdown-num {
+      font-family: 'Fredoka One', sans-serif;
+      font-size: clamp(2.5em, 8vw, 4.5em);
+      background: linear-gradient(135deg, var(--yellow), var(--orange));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      animation: countPulse 1s ease-in-out infinite;
+    }
+    @keyframes countPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
+    .countdown-label { color: rgba(255,255,255,0.5); font-size: 0.9em; margin-top: 6px; }
+
+    .draw-balls { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; padding: 10px 0; }
+    .draw-ball {
+      width: 64px; height: 64px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Fredoka One', sans-serif; font-size: 1.4em;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4), inset 0 -3px 0 rgba(0,0,0,0.2), inset 0 3px 6px rgba(255,255,255,0.2);
+      animation: ballBounceIn 0.5s cubic-bezier(.68,-0.55,.27,1.55) backwards;
+    }
+    .draw-ball.regular {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border: 3px solid #4ade80;
+      color: #fff;
+    }
+    .draw-ball.jolly {
+      background: linear-gradient(135deg, var(--yellow), var(--orange));
+      border: 3px solid #fff;
+      color: #1a1a1a;
+    }
+    @keyframes ballBounceIn {
+      from { transform: scale(0) rotate(-180deg); opacity: 0; }
+      to   { transform: scale(1) rotate(0deg);    opacity: 1; }
+    }
+    .draw-ball:nth-child(1){animation-delay:0.0s}
+    .draw-ball:nth-child(2){animation-delay:0.1s}
+    .draw-ball:nth-child(3){animation-delay:0.2s}
+    .draw-ball:nth-child(4){animation-delay:0.3s}
+    .draw-ball:nth-child(5){animation-delay:0.4s}
+    .draw-ball:nth-child(7){animation-delay:0.6s}
+
+    .draw-sep { color: rgba(255,255,255,0.2); font-size: 2em; align-self: center; }
+    .draw-ball-label { font-size: 0.65em; text-align: center; color: rgba(255,255,255,0.4); margin-top: 3px; letter-spacing: 1px; }
+    .ball-wrap { text-align: center; }
+    .week-chip {
+      display: inline-block; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 999px; padding: 3px 14px; font-size: 0.75em; color: rgba(255,255,255,0.5);
+      letter-spacing: 1px; margin-bottom: 14px;
+    }
+
+    /* ── WINNER ── */
+    .winner-box {
+      margin-top: 20px;
+      background: linear-gradient(135deg, rgba(255,211,61,0.12), rgba(249,115,22,0.12));
+      border: 2px solid var(--yellow);
+      border-radius: 20px; padding: 24px; text-align: center;
+      animation: winnerGlow 2s ease-in-out infinite;
+    }
+    @keyframes winnerGlow {
+      0%,100% { box-shadow: 0 0 20px rgba(255,211,61,0.2); }
+      50%      { box-shadow: 0 0 40px rgba(255,211,61,0.4), 0 0 60px rgba(249,115,22,0.2); }
+    }
+    .winner-emoji { font-size: 3.5em; animation: bounce 0.8s ease-in-out infinite alternate; display: block; }
+    @keyframes bounce { from{transform:translateY(0)} to{transform:translateY(-12px)} }
+    .winner-title-text {
+      font-family: 'Fredoka One', sans-serif; font-size: clamp(1.2em, 4vw, 1.8em);
+      background: linear-gradient(135deg, var(--yellow), var(--orange));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin: 8px 0 4px;
+    }
+    .winner-name { font-size: clamp(1.4em, 5vw, 2.2em); font-weight: 900; color: #fff; margin: 4px 0 8px; }
+    .winner-score { color: rgba(255,255,255,0.6); font-size: 0.9em; margin-bottom: 16px; }
+    .winner-badge {
+      width: 160px; height: 160px; object-fit: cover; border-radius: 50%;
+      border: 4px solid var(--yellow);
+      box-shadow: 0 0 0 8px rgba(255,211,61,0.15), 0 0 40px rgba(255,211,61,0.3);
+      display: block; margin: 0 auto 12px;
+      animation: badgeSpin 8s linear infinite;
+    }
+    @keyframes badgeSpin { 0%{box-shadow:0 0 0 8px rgba(255,211,61,0.15),0 0 40px rgba(255,211,61,0.3)} 50%{box-shadow:0 0 0 14px rgba(255,211,61,0.1),0 0 60px rgba(249,115,22,0.4)} 100%{box-shadow:0 0 0 8px rgba(255,211,61,0.15),0 0 40px rgba(255,211,61,0.3)} }
+    .screenshot-hint {
+      font-size: 0.82em; color: var(--yellow); font-weight: 700;
+      animation: blinkFast 1s ease-in-out infinite;
+      letter-spacing: 1px;
+    }
+    @keyframes blinkFast { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* ── SUBMIT FORM ── */
+    .name-input {
+      width: 100%; padding: 14px 18px;
+      background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 14px; color: #fff; font-size: 1.05em; font-family: 'Nunito', sans-serif;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      outline: none; transition: all 0.2s; margin-bottom: 18px;
+    }
+    .name-input:focus { border-color: var(--purple); box-shadow: 0 0 0 4px rgba(168,85,247,0.2); }
+    .name-input::placeholder { color: rgba(255,255,255,0.3); text-transform: none; }
+
+    .pick-counter {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; align-items: center;
+    }
+    .counter-chip {
+      padding: 6px 14px; border-radius: 999px; font-weight: 900; font-size: 0.85em;
+      border: 2px solid; transition: all 0.3s;
+    }
+    .counter-chip.nums { background: rgba(34,197,94,0.15);  border-color: var(--green);  color: var(--green);  }
+    .counter-chip.jolly{ background: rgba(255,211,61,0.15); border-color: var(--yellow); color: var(--yellow); }
+    .counter-chip.hint { background: transparent; border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.35); font-size: 0.78em; }
+    .counter-chip.nums.full  { background: rgba(34,197,94,0.3);  animation: chipPop 0.3s; }
+    .counter-chip.jolly.full { background: rgba(255,211,61,0.3);  animation: chipPop 0.3s; }
+    @keyframes chipPop { 0%{transform:scale(1)} 50%{transform:scale(1.15)} 100%{transform:scale(1)} }
+
+    /* ── NUMBER GRID ── */
+    .number-grid {
+      display: grid; grid-template-columns: repeat(10, 1fr);
+      gap: 5px; margin-bottom: 20px;
+    }
+    @media(max-width:540px){ .number-grid{grid-template-columns:repeat(9,1fr);gap:4px;} }
+    @media(max-width:400px){ .number-grid{grid-template-columns:repeat(6,1fr);gap:3px;} }
+
+    .num-tile {
+      aspect-ratio: 1; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Fredoka One', sans-serif; font-size: 0.88em;
+      background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.5); cursor: pointer;
+      transition: all 0.15s cubic-bezier(.68,-0.55,.27,1.55);
+      user-select: none; position: relative; overflow: hidden;
+    }
+    .num-tile::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .num-tile:hover:not(.locked)::before { opacity: 1; }
+    .num-tile:hover:not(.sel-num):not(.sel-jolly):not(.locked) {
+      background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3);
+      color: #fff; transform: scale(1.1);
+    }
+    .num-tile.sel-num {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      border-color: #4ade80; color: #fff;
+      box-shadow: 0 0 16px rgba(34,197,94,0.5), 0 4px 10px rgba(0,0,0,0.3);
+      transform: scale(1.12);
+      animation: tileSelect 0.3s cubic-bezier(.68,-0.55,.27,1.55);
+    }
+    .num-tile.sel-jolly {
+      background: linear-gradient(135deg, var(--orange), var(--yellow));
+      border-color: var(--yellow); color: #1a1a1a;
+      box-shadow: 0 0 16px rgba(255,211,61,0.6), 0 4px 10px rgba(0,0,0,0.3);
+      transform: scale(1.12);
+      animation: tileSelect 0.3s cubic-bezier(.68,-0.55,.27,1.55);
+    }
+    .num-tile.locked { opacity: 0.2; cursor: not-allowed; }
+    @keyframes tileSelect {
+      0%  { transform: scale(1); }
+      60% { transform: scale(1.2) rotate(-3deg); }
+      100%{ transform: scale(1.12) rotate(0deg); }
+    }
+
+    /* ── SUBMIT BUTTON ── */
+    .btn-play {
+      width: 100%; padding: 16px;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border: none; border-radius: 16px; color: #fff;
+      font-family: 'Fredoka One', sans-serif; font-size: 1.3em;
+      cursor: pointer; letter-spacing: 1px;
+      box-shadow: 0 8px 30px rgba(168,85,247,0.4);
+      transition: all 0.25s; position: relative; overflow: hidden;
+    }
+    .btn-play::after {
+      content: ''; position: absolute; top: -50%; left: -60%; width: 40%; height: 200%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: skewX(-20deg); animation: shimmer 3s infinite;
+    }
+    @keyframes shimmer { 0%{left:-60%} 100%{left:160%} }
+    .btn-play:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(168,85,247,0.5); }
+    .btn-play:active:not(:disabled) { transform: translateY(0); }
+    .btn-play:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-sm {
+      padding: 6px 16px; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 999px;
+      color: rgba(255,255,255,0.7); font-family: 'Nunito', sans-serif;
+      font-size: 0.8em; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-sm:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+    /* ── ALERTS ── */
+    .alert {
+      padding: 12px 16px; border-radius: 12px; margin: 12px 0;
+      font-weight: 700; font-size: 0.9em; display: none;
+    }
+    .alert.show { display: block; animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from{transform:translateY(-8px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .alert-err  { background: rgba(255,59,107,0.15); border: 1px solid var(--red);    color: #ff8fab; }
+    .alert-ok   { background: rgba(34,197,94,0.15);  border: 1px solid var(--green);  color: #86efac; }
+
+    /* ── SAVED PICKS ── */
+    .saved-box {
+      background: rgba(34,197,94,0.08); border: 2px solid rgba(34,197,94,0.3);
+      border-radius: 16px; padding: 20px; text-align: center; margin-top: 12px;
+    }
+    .saved-title { font-size: 0.82em; color: var(--green); font-weight: 900; letter-spacing: 2px; margin-bottom: 12px; }
+    .saved-balls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; }
+
+    /* ── LEADERBOARD ── */
+    .lb-row {
+      display: grid; grid-template-columns: 36px 1fr 150px 64px 52px;
+      gap: 8px; padding: 10px 12px; border-radius: 12px;
+      align-items: center; font-size: 0.85em; transition: background 0.15s;
+    }
+    .lb-row:hover { background: rgba(255,255,255,0.04); }
+    .lb-row.header { color: rgba(255,255,255,0.35); font-size: 0.75em; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
+    .lb-row.rank1 { background: rgba(255,211,61,0.06); border: 1px solid rgba(255,211,61,0.2); margin-bottom: 4px; }
+    .rank-ball {
+      width: 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 0.85em;
+      background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4);
+    }
+    .rank-ball.gold { background: linear-gradient(135deg,var(--yellow),var(--orange)); color: #1a1a1a; box-shadow: 0 0 12px rgba(255,211,61,0.4); }
+    .lb-name { font-weight: 900; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mini-balls { display: flex; flex-wrap: wrap; gap: 2px; }
+    .mb {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6em; font-weight: 900;
+    }
+    .mb.hit  { background: var(--green);  color: #fff; box-shadow: 0 0 6px rgba(34,197,94,0.4); }
+    .mb.miss { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.3); }
+    .mb.jhit { background: var(--yellow); color: #1a1a1a; box-shadow: 0 0 6px rgba(255,211,61,0.4); }
+    .mb.jmiss{ background: rgba(255,211,61,0.08); color: rgba(255,211,61,0.3); }
+    .score-val { font-weight: 900; }
+    .score-val.top { color: var(--yellow); }
+    .jolly-tick { font-size: 0.75em; padding: 2px 6px; background: rgba(255,211,61,0.15); border: 1px solid rgba(255,211,61,0.4); border-radius: 6px; color: var(--yellow); }
+    .lb-empty { text-align: center; padding: 30px; color: rgba(255,255,255,0.25); font-size: 0.9em; }
+    .lb-meta { font-size: 0.75em; color: rgba(255,255,255,0.3); margin-bottom: 10px; }
+
+    /* ── HALL OF SHAME ── */
+    .shame-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 12px; border-radius: 12px; border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.88em; transition: background 0.15s;
+    }
+    .shame-row:hover { background: rgba(255,255,255,0.04); }
+    .shame-week { color: rgba(255,255,255,0.3); min-width: 82px; font-size: 0.8em; }
+    .shame-name { flex: 1; font-weight: 900; color: var(--yellow); }
+    .shame-score { color: var(--green); font-size: 0.82em; }
+
+    /* ── SPINNER ── */
+    .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.15); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+
+    /* ── CONFETTI ── */
+    .confetto {
+      position: fixed; top: -10px; border-radius: 2px;
+      animation: confettiFall linear forwards; pointer-events: none; z-index: 9999;
+    }
+    @keyframes confettiFall {
+      0%   { transform: translateY(0) rotate(0deg);    opacity: 1; }
+      100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ── MOBILE ── */
+    @media(max-width:600px){
+      .card { padding: 16px 14px; }
+      .lb-row { grid-template-columns: 28px 1fr 100px 48px 40px; font-size: 0.75em; padding: 8px 6px; gap: 5px; }
+      .draw-ball { width: 50px; height: 50px; font-size: 1.15em; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Animated background emojis -->
+<div class="bg-stars"></div>
+<div id="bgEmojis"></div>
+
+<div class="wrap">
+
+  <!-- TOP ROW -->
+  <div class="top-row">
+    <a class="back-btn" href="index.html">← HUB</a>
+    <div class="lang-bar">
+      <button class="lang-btn active" data-lang="it" onclick="setLang('it')">🇮🇹</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">🇬🇧</button>
+      <button class="lang-btn" data-lang="fr" onclick="setLang('fr')">🇫🇷</button>
+      <button class="lang-btn" data-lang="de" onclick="setLang('de')">🇩🇪</button>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-badge">NGC ALLIANCE</div>
+    <h1 data-i18n="pageTitle">🎰 LOTTERIA NGC</h1>
+    <p class="sub" data-i18n="pageSub">Gioca ogni settimana • Chi vince diventa il Culone!</p>
+  </div>
+
+  <!-- ── SEZIONE 1: ESTRAZIONE ── -->
+  <div class="card">
+    <div class="card-title" style="color:var(--yellow)">🎱 <span data-i18n="drawTitle">Estrazione Settimanale</span></div>
+
+    <div id="drawLoading"><span class="spinner"></span> <span data-i18n="loading">Caricamento...</span></div>
+
+    <div id="drawFound" style="display:none">
+      <div style="text-align:center;margin-bottom:10px"><span class="week-chip" id="drawWeekChip"></span></div>
+      <div class="draw-balls" id="drawBalls"></div>
+      <!-- WINNER -->
+      <div class="winner-box" id="winnerBox" style="display:none;margin-top:20px">
+        <span class="winner-emoji">🏆</span>
+        <div class="winner-title-text" data-i18n="winnerTitle">🍑 CULONE DELLA SETTIMANA 🍑</div>
+        <div class="winner-name" id="winnerName">—</div>
+        <div class="winner-score" id="winnerScore"></div>
+        <img class="winner-badge" src="assets/war-icons/culone-badge.jpg" alt="Culone Badge"/>
+        <div class="screenshot-hint" data-i18n="screenshotHint">📸 SCREENSHOT E USA COME FOTO PROFILO!</div>
+      </div>
+    </div>
+
+    <div id="drawNone" style="display:none">
+      <div class="countdown-box">
+        <div class="countdown-num" id="countdownDisplay">—</div>
+        <div class="countdown-label" data-i18n="drawPending">Prossima estrazione domenica mattina</div>
+        <div style="margin-top:8px;font-size:0.8em;color:rgba(255,255,255,0.3)" data-i18n="picksOpen">Le giocate sono aperte!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SEZIONE 2: GIOCA ── -->
+  <div class="card">
+    <div class="card-title" style="color:var(--purple)">🎲 <span data-i18n="playTitle">Gioca i Tuoi Numeri</span></div>
+
+    <div id="alreadySubmitted" style="display:none">
+      <div class="alert alert-ok show" data-i18n="alreadyPlayed">✅ Hai già giocato questa settimana!</div>
+      <div class="saved-box" id="myPicksDisplay"></div>
+    </div>
+
+    <div id="submitForm">
+      <input class="name-input" type="text" id="playerNameInput" autocomplete="off" data-i18n-ph="namePh" placeholder="Il tuo nome in gioco..."/>
+
+      <div class="pick-counter">
+        <span class="counter-chip nums" id="chipNums">🟢 0/5</span>
+        <span class="counter-chip jolly" id="chipJolly">⭐ 0/1</span>
+        <span class="counter-chip hint" data-i18n="counterHint">seleziona 5 + 1 jolly</span>
+      </div>
+
+      <div class="number-grid" id="numberGrid"></div>
+
+      <div class="alert alert-err" id="submitError"></div>
+      <button class="btn-play" id="submitBtn" disabled onclick="submitPicks()" data-i18n="btnPlay">🎲 GIOCA!</button>
+      <p style="text-align:center;font-size:0.75em;color:rgba(255,255,255,0.25);margin-top:10px" data-i18n="oneShot">Una sola giocata a settimana.</p>
+    </div>
+  </div>
+
+  <!-- ── SEZIONE 3: CLASSIFICA ── -->
+  <div class="card">
+    <div class="card-title" style="color:var(--blue);justify-content:space-between">
+      <span>🏅 <span data-i18n="rankTitle">Classifica Settimanale</span></span>
+      <button class="btn-sm" onclick="loadLeaderboard()" data-i18n="btnRefresh">↻ Aggiorna</button>
+    </div>
+    <div id="lbLoading" style="display:none"><span class="spinner"></span></div>
+    <div id="lbContent"><div class="lb-empty" data-i18n="lbEmpty">Nessuna giocata ancora questa settimana</div></div>
+  </div>
+
+  <!-- ── SEZIONE 4: HALL OF SHAME ── -->
+  <div class="card">
+    <div class="card-title" style="color:var(--orange);justify-content:space-between">
+      <span>💩 <span data-i18n="shameTitle">Hall of Shame</span></span>
+      <button class="btn-sm" onclick="loadHallOfShame()" data-i18n="btnLoad">Carica</button>
+    </div>
+    <div id="shameContent"><div class="lb-empty" data-i18n="shameEmpty">I culoni storici appariranno qui</div></div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+// ════════════════════════════════════════════════
+var GAS_URL  = 'https://script.google.com/macros/s/AKfycbzVuSvYzCPn9_2_OswV9EHLaujZGauKoWMo_MDYhYj3wBNTDa9gLb9ekhWBypoAwYZ5gQ/exec';
+var LS_NAME  = 'smorfia_player_name';
+var LS_PICKS = 'smorfia_picks_';
+
+// ── TRANSLATIONS ──
+var T = {
+  it:{
+    pageTitle:'🎰 LOTTERIA NGC', pageSub:'Gioca ogni settimana • Chi vince diventa il Culone!',
+    drawTitle:'Estrazione Settimanale', loading:'Caricamento...',
+    winnerTitle:'🍑 CULONE DELLA SETTIMANA 🍑',
+    screenshotHint:'📸 SCREENSHOT E USA COME FOTO PROFILO!',
+    drawPending:'Prossima estrazione domenica mattina', picksOpen:'Le giocate sono aperte!',
+    playTitle:'Gioca i Tuoi Numeri', alreadyPlayed:'✅ Hai già giocato questa settimana!',
+    namePh:'Il tuo nome in gioco...', counterHint:'seleziona 5 + 1 jolly',
+    btnPlay:'🎲 GIOCA!', oneShot:'Una sola giocata a settimana. Il titolo viene assegnato ogni domenica.',
+    rankTitle:'Classifica Settimanale', btnRefresh:'↻ Aggiorna', lbEmpty:'Nessuna giocata ancora questa settimana',
+    shameTitle:'Hall of Shame', btnLoad:'Carica', shameEmpty:'I culoni storici appariranno qui',
+    savedTitle:'I TUOI NUMERI', jollyCol:'JOLLY', matchCol:'Match',
+    errName:'Inserisci il tuo nome prima di giocare.', errNums:'Seleziona 5 numeri + 1 jolly.',
+    errNet:'Errore di rete. Riprova.', submitting:'Invio in corso...',
+    notFound:'Nome non trovato nel roster. Contatta un R4.',
+  },
+  en:{
+    pageTitle:'🎰 LOTTERIA NGC', pageSub:'Play every week • Winner becomes the Butt of the Week!',
+    drawTitle:'Weekly Draw', loading:'Loading...',
+    winnerTitle:'🍑 BUTT OF THE WEEK 🍑',
+    screenshotHint:'📸 SCREENSHOT AND USE AS PROFILE PICTURE!',
+    drawPending:'Next draw on Sunday morning', picksOpen:'Picks are open now!',
+    playTitle:'Play Your Numbers', alreadyPlayed:'✅ You already played this week!',
+    namePh:'Your in-game name...', counterHint:'select 5 + 1 jolly',
+    btnPlay:'🎲 PLAY!', oneShot:'One play per week. Title awarded every Sunday.',
+    rankTitle:'Weekly Ranking', btnRefresh:'↻ Refresh', lbEmpty:'No plays yet this week',
+    shameTitle:'Hall of Shame', btnLoad:'Load', shameEmpty:'Historic winners will appear here',
+    savedTitle:'YOUR NUMBERS', jollyCol:'JOLLY', matchCol:'Match',
+    errName:'Enter your name first.', errNums:'Select 5 numbers + 1 jolly.',
+    errNet:'Network error. Try again.', submitting:'Submitting...',
+    notFound:'Name not found in roster. Contact an R4.',
+  },
+  fr:{
+    pageTitle:'🎰 LOTTERIA NGC', pageSub:'Joue chaque semaine • Le gagnant devient le Gros Derrière!',
+    drawTitle:'Tirage Hebdomadaire', loading:'Chargement...',
+    winnerTitle:'🍑 GROS DERRIÈRE DE LA SEMAINE 🍑',
+    screenshotHint:'📸 SCREENSHOT ET UTILISE COMME PHOTO DE PROFIL!',
+    drawPending:'Prochain tirage dimanche matin', picksOpen:'Les mises sont ouvertes!',
+    playTitle:'Joue Tes Numéros', alreadyPlayed:'✅ Tu as déjà joué cette semaine!',
+    namePh:'Ton nom en jeu...', counterHint:'sélectionne 5 + 1 joker',
+    btnPlay:'🎲 JOUER!', oneShot:'Une seule mise par semaine. Titre décerné chaque dimanche.',
+    rankTitle:'Classement Semaine', btnRefresh:'↻ Actualiser', lbEmpty:'Aucune mise encore cette semaine',
+    shameTitle:'Hall of Shame', btnLoad:'Charger', shameEmpty:'Les vainqueurs historiques apparaîtront ici',
+    savedTitle:'TES NUMÉROS', jollyCol:'JOKER', matchCol:'Trouvés',
+    errName:'Entre ton nom avant de jouer.', errNums:'Sélectionne 5 numéros + 1 joker.',
+    errNet:'Erreur réseau. Réessaie.', submitting:'Envoi...',
+    notFound:'Nom introuvable dans le roster. Contacte un R4.',
+  },
+  de:{
+    pageTitle:'🎰 LOTTERIA NGC', pageSub:'Spiele jede Woche • Gewinner wird der Hintern der Woche!',
+    drawTitle:'Wöchentliche Ziehung', loading:'Laden...',
+    winnerTitle:'🍑 HINTERN DER WOCHE 🍑',
+    screenshotHint:'📸 SCREENSHOT UND ALS PROFILBILD NUTZEN!',
+    drawPending:'Nächste Ziehung Sonntagmorgen', picksOpen:'Tipps sind jetzt offen!',
+    playTitle:'Deine Zahlen Spielen', alreadyPlayed:'✅ Du hast diese Woche bereits gespielt!',
+    namePh:'Dein In-Game-Name...', counterHint:'wähle 5 + 1 Joker',
+    btnPlay:'🎲 SPIELEN!', oneShot:'Nur ein Tipp pro Woche. Titel jeden Sonntag vergeben.',
+    rankTitle:'Wöchentliches Ranking', btnRefresh:'↻ Aktualisieren', lbEmpty:'Noch keine Tipps diese Woche',
+    shameTitle:'Hall of Shame', btnLoad:'Laden', shameEmpty:'Historische Gewinner erscheinen hier',
+    savedTitle:'DEINE ZAHLEN', jollyCol:'JOKER', matchCol:'Treffer',
+    errName:'Gib deinen Namen ein.', errNums:'Wähle 5 Zahlen + 1 Joker.',
+    errNet:'Netzwerkfehler. Erneut versuchen.', submitting:'Senden...',
+    notFound:'Name nicht im Roster. Kontaktiere einen R4.',
+  }
+};
+
+var currentLang = localStorage.getItem('alliance_hub_lang') || 'it';
+var selectedNums = [], selectedJolly = null;
+var currentWeekId = null, currentDraw = null;
+var CONFETTI_COLORS = ['#ff3b6b','#ffd93d','#a855f7','#3b82f6','#22c55e','#f97316','#ec4899'];
+
+function t(k){ return (T[currentLang]||T.en)[k] || (T.en[k]||k); }
+
+// ── LANG ──
+function setLang(lang){
+  currentLang=lang; localStorage.setItem('alliance_hub_lang',lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('active',b.dataset.lang===lang); });
+  applyT();
+}
+function applyT(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ var v=t(el.dataset.i18n); if(v) el.textContent=v; });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){ var v=t(el.dataset.i18nPh); if(v) el.placeholder=v; });
+  var btn=document.getElementById('submitBtn');
+  if(btn&&!btn.dataset.busy) btn.textContent=t('btnPlay');
+}
+
+// ── BACKGROUND EMOJIS ──
+function spawnBgEmojis(){
+  var emojis=['🎰','🍀','⭐','🎲','💫','🎯','🔮','✨','🎪'];
+  var c=document.getElementById('bgEmojis');
+  for(var i=0;i<12;i++){
+    (function(idx){
+      setTimeout(function(){
+        var el=document.createElement('div');
+        el.className='floating-emoji';
+        el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+        el.style.left=Math.random()*100+'vw';
+        el.style.animationDuration=(12+Math.random()*18)+'s';
+        el.style.animationDelay=(Math.random()*10)+'s';
+        el.style.fontSize=(1.2+Math.random()*1.5)+'rem';
+        c.appendChild(el);
+        el.addEventListener('animationend',function(){ el.remove(); spawnOne(); });
+      },idx*800);
+    })(i);
+  }
+}
+function spawnOne(){
+  var emojis=['🎰','🍀','⭐','🎲','💫','🎯','🔮','✨','🎪'];
+  var c=document.getElementById('bgEmojis');
+  var el=document.createElement('div');
+  el.className='floating-emoji';
+  el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+  el.style.left=Math.random()*100+'vw';
+  el.style.animationDuration=(12+Math.random()*18)+'s';
+  el.style.fontSize=(1.2+Math.random()*1.5)+'rem';
+  c.appendChild(el);
+  el.addEventListener('animationend',function(){ el.remove(); spawnOne(); });
+}
+
+// ── CONFETTI ──
+function launchConfetti(){
+  for(var i=0;i<80;i++){
+    (function(idx){
+      setTimeout(function(){
+        var el=document.createElement('div');
+        el.className='confetto';
+        el.style.left=Math.random()*100+'vw';
+        el.style.width=(6+Math.random()*8)+'px';
+        el.style.height=(10+Math.random()*12)+'px';
+        el.style.background=CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)];
+        el.style.animationDuration=(1.5+Math.random()*2.5)+'s';
+        el.style.animationDelay=(Math.random()*0.8)+'s';
+        document.body.appendChild(el);
+        el.addEventListener('animationend',function(){el.remove();});
+      },idx*20);
+    })(i);
+  }
+}
+
+// ── WEEK ID ──
+function getWeekId(){
+  var d=new Date();
+  var date=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  var dayNum=date.getUTCDay()||7;
+  date.setUTCDate(date.getUTCDate()+4-dayNum);
+  var yearStart=new Date(Date.UTC(date.getUTCFullYear(),0,1));
+  var weekNo=Math.ceil((((date-yearStart)/86400000)+1)/7);
+  return date.getUTCFullYear()+'-W'+(weekNo<10?'0':'')+weekNo;
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded',function(){
+  spawnBgEmojis();
+  applyT();
+  buildGrid();
+  loadDraw();
+  startCountdown();
+  var saved=localStorage.getItem(LS_NAME);
+  if(saved){ document.getElementById('playerNameInput').value=saved; checkAlreadySubmitted(saved); }
+  document.getElementById('playerNameInput').addEventListener('input',function(){
+    this.value=this.value.toUpperCase();
+    localStorage.setItem(LS_NAME,this.value.trim());
+    if(this.value.trim()) checkAlreadySubmitted(this.value.trim());
+  });
+});
+
+// ── DRAW ──
+function loadDraw(){
+  currentWeekId=getWeekId();
+  show('drawLoading'); hide('drawFound'); hide('drawNone');
+  gasGet('getWeeklyDraw').then(function(res){
+    hide('drawLoading');
+    if(res.status==='success'&&res.data&&res.data.numbers){
+      currentDraw=res.data; renderDraw(res.data); show('drawFound');
+    } else { show('drawNone'); }
+    var name=document.getElementById('playerNameInput').value.trim();
+    if(name) checkAlreadySubmitted(name);
+    loadLeaderboard();
+  }).catch(function(){ hide('drawLoading'); show('drawNone'); loadLeaderboard(); });
+}
+
+function renderDraw(data){
+  document.getElementById('drawWeekChip').textContent='WEEK '+(data.weekId||currentWeekId);
+  var c=document.getElementById('drawBalls'); c.innerHTML='';
+  data.numbers.forEach(function(n,i){
+    c.innerHTML+='<div class="ball-wrap"><div class="draw-ball regular" style="animation-delay:'+(i*0.1)+'s">'+n+'</div><div class="draw-ball-label">N</div></div>';
+  });
+  c.innerHTML+='<div class="draw-sep">|</div>';
+  c.innerHTML+='<div class="ball-wrap"><div class="draw-ball jolly" style="animation-delay:0.6s">'+data.jolly+'</div><div class="draw-ball-label">'+t('jollyCol')+'</div></div>';
+}
+
+// ── GRID ──
+function buildGrid(){
+  var g=document.getElementById('numberGrid'); g.innerHTML='';
+  for(var i=1;i<=90;i++){
+    var d=document.createElement('div');
+    d.className='num-tile'; d.textContent=i; d.dataset.num=i;
+    d.addEventListener('click',onTile);
+    g.appendChild(d);
+  }
+}
+
+function onTile(e){
+  var tile=e.currentTarget;
+  if(tile.classList.contains('locked')) return;
+  var n=+tile.dataset.num;
+  if(tile.classList.contains('sel-num')){
+    tile.classList.remove('sel-num');
+    selectedNums=selectedNums.filter(function(x){return x!==n;});
+  } else if(tile.classList.contains('sel-jolly')){
+    tile.classList.remove('sel-jolly'); selectedJolly=null;
+  } else if(selectedNums.length<5){
+    selectedNums.push(n); tile.classList.add('sel-num');
+  } else if(selectedJolly===null){
+    selectedJolly=n; tile.classList.add('sel-jolly');
+  } else {
+    document.querySelector('.num-tile.sel-jolly').classList.remove('sel-jolly');
+    selectedJolly=n; tile.classList.add('sel-jolly');
+  }
+  updateCounters();
+}
+
+function updateCounters(){
+  var nc=document.getElementById('chipNums');
+  var jc=document.getElementById('chipJolly');
+  nc.textContent='🟢 '+selectedNums.length+'/5';
+  jc.textContent='⭐ '+(selectedJolly!==null?1:0)+'/1';
+  nc.classList.toggle('full',selectedNums.length===5);
+  jc.classList.toggle('full',selectedJolly!==null);
+  document.getElementById('submitBtn').disabled=!(selectedNums.length===5&&selectedJolly!==null);
+}
+
+// ── ALREADY SUBMITTED ──
+function checkAlreadySubmitted(name){
+  var wid=getWeekId();
+  var cache=localStorage.getItem(LS_PICKS+wid+'_'+name);
+  if(cache){try{return showSaved(JSON.parse(cache));}catch(e){}}
+  gasGet('getMySmorfiapicks&playerName='+encodeURIComponent(name)).then(function(res){
+    if(res.status==='success'&&res.data&&res.data.numbers){ localStorage.setItem(LS_PICKS+wid+'_'+name,JSON.stringify(res.data)); showSaved(res.data); }
+    else showForm();
+  }).catch(showForm);
+}
+
+function showSaved(p){
+  show('alreadySubmitted'); hide('submitForm');
+  var html='<div class="saved-title">'+t('savedTitle')+' — '+(p.weekId||getWeekId())+'</div><div class="saved-balls">';
+  p.numbers.forEach(function(n){ html+=bball(n,'regular','46px'); });
+  html+='<span style="color:rgba(255,255,255,0.2);font-size:1.4em;align-self:center">|</span>';
+  html+=bball(p.jolly,'jolly','46px');
+  html+='</div>';
+  document.getElementById('myPicksDisplay').innerHTML=html;
+}
+function showForm(){ hide('alreadySubmitted'); show('submitForm'); }
+
+function bball(n,cls,sz){
+  return '<div class="draw-ball '+cls+'" style="width:'+sz+';height:'+sz+';font-size:0.95em;animation:none">'+n+'</div>';
+}
+
+// ── SUBMIT ──
+function submitPicks(){
+  var name=document.getElementById('playerNameInput').value.trim().toUpperCase();
+  document.getElementById('submitError').classList.remove('show');
+  if(!name){showErr(t('errName'));return;}
+  if(selectedNums.length!==5||selectedJolly===null){showErr(t('errNums'));return;}
+  var btn=document.getElementById('submitBtn');
+  btn.disabled=true; btn.dataset.busy='1'; btn.textContent=t('submitting');
+  gasPost({action:'saveSmorfiapicks',playerName:name,numbers:selectedNums.slice(),jolly:selectedJolly}).then(function(res){
+    delete btn.dataset.busy;
+    if(res.status==='success'){
+      var picks={numbers:selectedNums.slice(),jolly:selectedJolly,weekId:getWeekId()};
+      localStorage.setItem(LS_PICKS+getWeekId()+'_'+name,JSON.stringify(picks));
+      localStorage.setItem(LS_NAME,name);
+      launchConfetti();
+      showSaved(picks);
+      loadLeaderboard();
+    } else {
+      showErr((res.message||'ERRORE').toUpperCase());
+      btn.disabled=false; btn.textContent=t('btnPlay');
+    }
+  }).catch(function(){
+    delete btn.dataset.busy;
+    showErr(t('errNet'));
+    btn.disabled=false; btn.textContent=t('btnPlay');
+  });
+}
+function showErr(msg){ var el=document.getElementById('submitError'); el.textContent='⚠ '+msg; el.classList.add('show'); }
+
+// ── LEADERBOARD ──
+function loadLeaderboard(){
+  var lbL=document.getElementById('lbLoading');
+  var lbC=document.getElementById('lbContent');
+  lbL.style.display='block'; lbC.innerHTML='';
+  gasGet('getSmorfiaLeaderboard').then(function(res){
+    lbL.style.display='none';
+    if(res.status==='success'&&res.data&&res.data.entries&&res.data.entries.length){
+      renderLeaderboard(res.data);
+    } else {
+      lbC.innerHTML='<div class="lb-empty">'+t('lbEmpty')+'</div>';
+      hide('winnerBox');
+    }
+  }).catch(function(){ lbL.style.display='none'; lbC.innerHTML='<div class="lb-empty">— Errore —</div>'; });
+}
+
+function renderLeaderboard(data){
+  var drawn=data.drawn, entries=data.entries;
+  if(drawn&&entries.length&&entries[0].matches>0){
+    var w=entries[0];
+    document.getElementById('winnerName').textContent=w.playerName;
+    document.getElementById('winnerScore').textContent=w.matches+'/5 '+t('matchCol')+(w.jollyMatched?' + JOLLY ⭐':'');
+    show('winnerBox');
+  } else { hide('winnerBox'); }
+
+  var html='<div class="lb-meta">WEEK: '+(data.weekId||currentWeekId)+' | '+entries.length+' players</div>';
+  html+='<div class="lb-row header"><span>#</span><span>Player</span><span>'+t('matchCol')+'</span><span>Score</span><span>'+t('jollyCol')+'</span></div>';
+
+  entries.forEach(function(e,i){
+    var first=i===0&&drawn&&e.matches>0;
+    html+='<div class="lb-row'+(first?' rank1':'')+'">'+
+      '<div class="rank-ball'+(first?' gold':'')+'>'+(i+1)+'</div>'+
+      '<div class="lb-name">'+esc(e.playerName)+'</div>'+
+      '<div class="mini-balls">';
+    if(e.numbers){
+      e.numbers.forEach(function(n){
+        var m=drawn&&data.drawnNumbers&&data.drawnNumbers.indexOf(n)!==-1;
+        html+='<div class="mb '+(m?'hit':'miss')+'">'+n+'</div>';
+      });
+      if(e.jolly!==undefined){
+        var jm=drawn&&data.drawnJolly===e.jolly;
+        html+='<div class="mb '+(jm?'jhit':'jmiss')+'">'+e.jolly+'</div>';
+      }
+    }
+    html+='</div>'+
+      '<div class="score-val'+(first?' top':'')+'">'+( drawn ? e.matches+'/5' : '—' )+'</div>'+
+      '<div>'+(drawn?(e.jollyMatched?'<span class="jolly-tick">✓</span>':'<span style="color:rgba(255,255,255,0.15)">—</span>'):'<span style="color:rgba(255,255,255,0.15)">—</span>')+'</div>'+
+      '</div>';
+  });
+  document.getElementById('lbContent').innerHTML=html;
+}
+
+// ── HALL OF SHAME ──
+function loadHallOfShame(){
+  var el=document.getElementById('shameContent');
+  el.innerHTML='<div class="lb-empty"><span class="spinner"></span></div>';
+  gasGet('getSmorfiaHallOfShame').then(function(res){
+    if(res.status==='success'&&res.data&&res.data.length){
+      var html='';
+      res.data.forEach(function(r){
+        html+='<div class="shame-row">'+
+          '<span class="shame-week">'+esc(r.weekId)+'</span>'+
+          '<span class="shame-name">🍑 '+esc(r.playerName)+'</span>'+
+          '<span class="shame-score">'+r.matches+'/5'+(r.jollyMatched?' +J':'')+'</span>'+
+          '</div>';
+      });
+      el.innerHTML=html;
+    } else { el.innerHTML='<div class="lb-empty">'+t('shameEmpty')+'</div>'; }
+  }).catch(function(){ el.innerHTML='<div class="lb-empty">— Errore —</div>'; });
+}
+
+// ── COUNTDOWN ──
+function startCountdown(){ updateCD(); setInterval(updateCD,1000); }
+function updateCD(){
+  var now=new Date(), next=new Date(now);
+  var day=now.getDay();
+  next.setDate(now.getDate()+(day===0?7:7-day)); next.setHours(10,0,0,0);
+  var diff=Math.max(0,next-now);
+  var days=Math.floor(diff/86400000);
+  var h=Math.floor((diff%86400000)/3600000);
+  var m=Math.floor((diff%3600000)/60000);
+  var s=Math.floor((diff%60000)/1000);
+  var el=document.getElementById('countdownDisplay');
+  if(el) el.textContent=(days>0?days+'g ':'')+p2(h)+':'+p2(m)+':'+p2(s);
+}
+function p2(n){return n<10?'0'+n:''+n;}
+
+// ── GAS ──
+function gasGet(action){ return fetch(GAS_URL+'?action='+action).then(function(r){return r.json();}); }
+function gasPost(payload){ return fetch(GAS_URL,{method:'POST',body:JSON.stringify(payload)}).then(function(r){return r.json();}); }
+
+// ── UTILS ──
+function show(id){var el=document.getElementById(id);if(el)el.style.display='block';}
+function hide(id){var el=document.getElementById(id);if(el)el.style.display='none';}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>
