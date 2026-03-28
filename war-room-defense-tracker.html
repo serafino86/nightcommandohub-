@@ -389,21 +389,21 @@
 
     /* ✅ MEMBER MANAGEMENT PANEL */
     .mgmt-panel {
-      margin-top: 24px;
-      border: 1px solid #374151;
+      border: 2px solid #b45309;
       border-radius: 10px;
       overflow: hidden;
+      box-shadow: 0 0 12px rgba(180, 83, 9, 0.3);
     }
 
     .mgmt-toggle {
-      background: rgba(71, 85, 105, 0.4);
-      color: #94a3b8;
-      padding: 12px 16px;
+      background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+      color: #fcd34d;
+      padding: 14px 18px;
       cursor: pointer;
       font-size: 13px;
       font-family: 'Courier New', monospace;
       letter-spacing: 2px;
-      font-weight: 600;
+      font-weight: 700;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -411,7 +411,7 @@
       transition: background 0.2s;
     }
 
-    .mgmt-toggle:hover { background: rgba(71, 85, 105, 0.6); }
+    .mgmt-toggle:hover { background: linear-gradient(135deg, #92400e 0%, #b45309 100%); }
 
     .mgmt-body {
       display: none;
@@ -757,31 +757,33 @@
         <button class="btn btn-primary" id="submitBtn">💾 TRANSMIT TO DATABASE</button>
         <div class="alert alert-success" id="successAlert"></div>
         <div class="alert alert-error" id="errorAlert"></div>
+      </div>
+    </div>
 
-        <!-- ✅ MEMBER MANAGEMENT PANEL (R4 only) -->
-        <div class="mgmt-panel">
-          <div class="mgmt-toggle" id="mgmtToggle">🔧 MEMBER MANAGEMENT <span class="mgmt-chevron">▼</span></div>
-          <div class="mgmt-body" id="mgmtBody">
-            <div class="input-group" style="margin-top:12px;">
-              <label>🔐 R4 COMMAND CODE:</label>
-              <input type="password" id="r4Code" placeholder="Enter R4/R5 code" />
-            </div>
-            <button class="btn" id="loadMembersBtn" style="background:#475569;margin-top:8px;">📋 LOAD MEMBERS LIST</button>
-            <div id="membersPanel" style="display:none;margin-top:14px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                <span id="membersCount" style="color:#7fa87a;font-size:13px;letter-spacing:1px;"></span>
-                <label style="color:#94a3b8;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;">
-                  <input type="checkbox" id="selectAllMembers"> SELECT ALL
-                </label>
-              </div>
-              <div id="membersList" class="members-list"></div>
-              <button class="btn" id="deleteMembersBtn" style="background:#dc2626;color:white;margin-top:10px;display:none;">
-                🗑️ DELETE SELECTED
-              </button>
-            </div>
-            <div class="alert alert-success" id="mgmtSuccess"></div>
-            <div class="alert alert-error" id="mgmtError"></div>
+    <!-- ✅ MEMBER MANAGEMENT PANEL (R4 only) — sezione separata -->
+    <div style="padding: 0 30px 30px;">
+      <div class="mgmt-panel">
+        <div class="mgmt-toggle" id="mgmtToggle">🗑️ MEMBER MANAGEMENT — Remove inactive players <span class="mgmt-chevron">▼</span></div>
+        <div class="mgmt-body" id="mgmtBody">
+          <div class="input-group" style="margin-top:12px;">
+            <label>🔐 R4 COMMAND CODE:</label>
+            <input type="password" id="r4Code" placeholder="Enter R4/R5 code" />
           </div>
+          <button class="btn" id="loadMembersBtn" style="background:#475569;margin-top:8px;">📋 LOAD MEMBERS LIST</button>
+          <div id="membersPanel" style="display:none;margin-top:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span id="membersCount" style="color:#7fa87a;font-size:13px;letter-spacing:1px;"></span>
+              <label style="color:#94a3b8;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;">
+                <input type="checkbox" id="selectAllMembers"> SELECT ALL
+              </label>
+            </div>
+            <div id="membersList" class="members-list"></div>
+            <button class="btn" id="deleteMembersBtn" style="background:#dc2626;color:white;margin-top:10px;display:none;">
+              🗑️ DELETE SELECTED
+            </button>
+          </div>
+          <div class="alert alert-success" id="mgmtSuccess"></div>
+          <div class="alert alert-error" id="mgmtError"></div>
         </div>
       </div>
     </div>
