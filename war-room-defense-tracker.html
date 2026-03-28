@@ -815,7 +815,7 @@
         const response = await fetch(NGC_SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({
             action: 'add',
             data: data
@@ -1380,7 +1380,7 @@
         try {
           const res = await fetch(NGC_SCRIPT_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify({ action: 'deletePlayer', playerName: name, r4Code })
           });
           const result = await res.json();
