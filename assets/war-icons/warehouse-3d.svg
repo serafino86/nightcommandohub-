@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </radialGradient>
+  </defs>
+  <polygon points="40,4 72,22 72,58 40,76 8,58 8,22" fill="url(#bg)" opacity="0.95"/>
+  <polygon points="40,8 68,24 68,56 40,72 12,56 12,24" fill="none" stroke="#94a3b8" stroke-width="1.5" opacity="0.4"/>
+  <!-- Box/crate isometric -->
+  <!-- Top face -->
+  <polygon points="40,16 60,26 40,36 20,26" fill="#e2e8f0"/>
+  <!-- Left face -->
+  <polygon points="20,26 40,36 40,60 20,50" fill="#94a3b8"/>
+  <!-- Right face -->
+  <polygon points="60,26 40,36 40,60 60,50" fill="#cbd5e1"/>
+  <!-- Crate lines top -->
+  <line x1="40" y1="16" x2="40" y2="36" stroke="#64748b" stroke-width="1.2"/>
+  <line x1="20" y1="26" x2="60" y2="26" stroke="#64748b" stroke-width="1.2"/>
+  <!-- Crate lines sides -->
+  <line x1="20" y1="38" x2="40" y2="48" stroke="#64748b" stroke-width="1"/>
+  <line x1="60" y1="38" x2="40" y2="48" stroke="#64748b" stroke-width="1"/>
+  <ellipse cx="28" cy="20" rx="7" ry="3.5" fill="white" opacity="0.12" transform="rotate(-30 28 20)"/>
+</svg>

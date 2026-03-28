@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#78350f"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <polygon points="40,4 72,22 72,58 40,76 8,58 8,22" fill="url(#bg)" opacity="0.95"/>
+  <polygon points="40,8 68,24 68,56 40,72 12,56 12,24" fill="none" stroke="#fcd34d" stroke-width="1.5" opacity="0.5"/>
+  <!-- Lightning bolt -->
+  <polygon points="46,14 32,42 42,42 34,66 54,36 44,36" fill="white" filter="url(#glow)"/>
+  <ellipse cx="28" cy="22" rx="8" ry="4" fill="white" opacity="0.15" transform="rotate(-30 28 22)"/>
+</svg>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#052e16"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <polygon points="40,4 72,22 72,58 40,76 8,58 8,22" fill="url(#bg)" opacity="0.95"/>
+  <polygon points="40,8 68,24 68,56 40,72 12,56 12,24" fill="none" stroke="#4ade80" stroke-width="1.5" opacity="0.5"/>
+  <!-- Biohazard symbol -->
+  <g transform="translate(40,40)" filter="url(#glow)">
+    <circle r="5" fill="#d1fae5"/>
+    <!-- Three arcs -->
+    <path d="M0,-18 A18,18 0 0,1 15.6,9 L8,4.5 A9,9 0 0,0 0,-9 Z" fill="#bbf7d0"/>
+    <path d="M15.6,9 A18,18 0 0,1 -15.6,9 L-8,4.5 A9,9 0 0,0 8,4.5 Z" fill="#bbf7d0"/>
+    <path d="M-15.6,9 A18,18 0 0,1 0,-18 L0,-9 A9,9 0 0,0 -8,4.5 Z" fill="#bbf7d0"/>
+    <!-- Spikes -->
+    <circle cx="0" cy="-21" r="3" fill="#d1fae5"/>
+    <circle cx="18.2" cy="10.5" r="3" fill="#d1fae5"/>
+    <circle cx="-18.2" cy="10.5" r="3" fill="#d1fae5"/>
+  </g>
+  <ellipse cx="28" cy="22" rx="8" ry="4" fill="white" opacity="0.15" transform="rotate(-30 28 22)"/>
+</svg>

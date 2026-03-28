@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#1e3a5f"/>
+    </radialGradient>
+  </defs>
+  <polygon points="40,4 72,22 72,58 40,76 8,58 8,22" fill="url(#bg)" opacity="0.95"/>
+  <polygon points="40,8 68,24 68,56 40,72 12,56 12,24" fill="none" stroke="#93c5fd" stroke-width="1.5" opacity="0.4"/>
+  <!-- Server racks -->
+  <rect x="20" y="18" width="40" height="9" rx="3" fill="#bfdbfe"/>
+  <circle cx="54" cy="22.5" r="2.5" fill="#22d3ee"/>
+  <rect x="22" y="21" width="20" height="3" rx="1.5" fill="#93c5fd" opacity="0.6"/>
+
+  <rect x="20" y="30" width="40" height="9" rx="3" fill="#bfdbfe"/>
+  <circle cx="54" cy="34.5" r="2.5" fill="#4ade80"/>
+  <rect x="22" y="33" width="20" height="3" rx="1.5" fill="#93c5fd" opacity="0.6"/>
+
+  <rect x="20" y="42" width="40" height="9" rx="3" fill="#bfdbfe"/>
+  <circle cx="54" cy="46.5" r="2.5" fill="#22d3ee"/>
+  <rect x="22" y="45" width="20" height="3" rx="1.5" fill="#93c5fd" opacity="0.6"/>
+
+  <rect x="20" y="54" width="40" height="9" rx="3" fill="#bfdbfe"/>
+  <circle cx="54" cy="58.5" r="2.5" fill="#fbbf24"/>
+  <rect x="22" y="57" width="20" height="3" rx="1.5" fill="#93c5fd" opacity="0.6"/>
+  <ellipse cx="28" cy="22" rx="8" ry="4" fill="white" opacity="0.12" transform="rotate(-30 28 22)"/>
+</svg>

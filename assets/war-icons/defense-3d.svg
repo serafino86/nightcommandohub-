@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#f87171"/>
+      <stop offset="100%" stop-color="#7f0000"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <polygon points="40,4 72,22 72,58 40,76 8,58 8,22" fill="url(#bg)" opacity="0.95"/>
+  <polygon points="40,8 68,24 68,56 40,72 12,56 12,24" fill="none" stroke="#fca5a5" stroke-width="1.5" opacity="0.4"/>
+  <!-- Shield -->
+  <path d="M40,16 L57,23 L57,42 Q57,58 40,64 Q23,58 23,42 L23,23 Z" fill="#fef2f2" filter="url(#glow)"/>
+  <path d="M40,20 L53,26 L53,42 Q53,55 40,60 Q27,55 27,42 L27,26 Z" fill="#ef4444"/>
+  <!-- Checkmark / star on shield -->
+  <path d="M33,40 L38,46 L48,33" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <ellipse cx="28" cy="22" rx="8" ry="4" fill="white" opacity="0.15" transform="rotate(-30 28 22)"/>
+</svg>
