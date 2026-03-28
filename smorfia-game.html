@@ -919,12 +919,21 @@ function rollDice(){
 // ── ALREADY SUBMITTED ──
 function checkAlreadySubmitted(name){
   var wid=getWeekId();
-  var cache=localStorage.getItem(LS_PICKS+wid+'_'+name);
-  if(cache){try{return showSaved(JSON.parse(cache));}catch(e){}}
+  // Verifica sempre dal GAS — il localStorage può essere stale se la giocata è stata cancellata
   gasGet('getMySmorfiapicks&playerName='+encodeURIComponent(name)).then(function(res){
-    if(res.status==='success'&&res.data&&res.data.numbers){ localStorage.setItem(LS_PICKS+wid+'_'+name,JSON.stringify(res.data)); showSaved(res.data); }
-    else showForm();
-  }).catch(showForm);
+    if(res.status==='success'&&res.data&&res.data.numbers){
+      localStorage.setItem(LS_PICKS+wid+'_'+name,JSON.stringify(res.data));
+      showSaved(res.data);
+    } else {
+      localStorage.removeItem(LS_PICKS+wid+'_'+name); // pulisce cache stale
+      showForm();
+    }
+  }).catch(function(){
+    // In caso di errore rete usa la cache locale come fallback
+    var cache=localStorage.getItem(LS_PICKS+wid+'_'+name);
+    if(cache){try{return showSaved(JSON.parse(cache));}catch(e){}}
+    showForm();
+  });
 }
 
 function showSaved(p){
