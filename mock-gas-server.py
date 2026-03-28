@@ -38,7 +38,8 @@ def gen_picks_with_bias(n_forced):
     random.shuffle(nums)
     jolly_pool = [n for n in range(1,91) if n not in nums]
     jolly = JOLLY if random.random() < 0.15 else random.choice(jolly_pool)
-    return nums, jolly
+    dice_total = random.randint(1,6) + random.randint(1,6) + random.randint(1,6)
+    return nums, jolly, dice_total
 
 # Distribuzione realistica: 1 vincitore con 4, qualcuno con 3, molti con 1-2, tanti con 0
 BIAS = (
@@ -52,19 +53,20 @@ random.shuffle(BIAS)
 
 ALL_ENTRIES = []
 for name, bias in zip(NAMES, BIAS):
-    nums, jolly = gen_picks_with_bias(bias)
+    nums, jolly, dice_total = gen_picks_with_bias(bias)
     m, jm = count_matches(nums, jolly)
     ALL_ENTRIES.append({
         "playerName": name,
         "numbers": nums,
         "jolly": jolly,
+        "diceTotal": dice_total,
         "matches": m,
         "jollyMatched": jm,
         "weekId": WEEK,
     })
 
-# Sort: matches desc, jolly desc, name asc
-ALL_ENTRIES.sort(key=lambda e: (-e["matches"], -int(e["jollyMatched"]), e["playerName"]))
+# Sort: matches desc, jolly desc, diceTotal desc, name asc
+ALL_ENTRIES.sort(key=lambda e: (-e["matches"], -int(e["jollyMatched"]), -e["diceTotal"], e["playerName"]))
 for i, e in enumerate(ALL_ENTRIES):
     e["rank"] = i + 1
 

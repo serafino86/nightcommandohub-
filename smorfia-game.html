@@ -365,6 +365,69 @@
     .shame-name { flex: 1; font-weight: 900; color: var(--yellow); }
     .shame-score { color: var(--green); font-size: 0.82em; }
 
+    /* ── DICE PLAYOFF ── */
+    .playoff-box {
+      margin: 16px 0; padding: 20px; border-radius: 16px;
+      background: linear-gradient(135deg, rgba(251,146,60,0.12), rgba(239,68,68,0.08));
+      border: 2px solid rgba(251,146,60,0.4);
+    }
+    .playoff-title {
+      font-family: 'Fredoka One', cursive; font-size: 1.2em;
+      color: var(--orange); text-align: center; margin-bottom: 16px;
+      animation: pulse 1s ease-in-out infinite;
+    }
+    .playoff-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 14px; border-radius: 12px; margin-bottom: 8px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      transition: border-color 0.3s;
+    }
+    .playoff-row.winner-dice { border-color: rgba(255,211,61,0.5); background: rgba(255,211,61,0.06); }
+    .playoff-name { flex: 1; font-weight: 900; font-size: 0.95em; }
+    .dice-face {
+      width: 48px; height: 48px; border-radius: 10px;
+      background: rgba(255,255,255,0.12); border: 2px solid rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6em; font-family: 'Fredoka One', cursive;
+      transition: all 0.15s;
+    }
+    .dice-face.rolling {
+      animation: diceShake 0.1s linear infinite;
+      background: rgba(251,146,60,0.2); border-color: var(--orange);
+    }
+    .dice-face.landed {
+      background: rgba(255,211,61,0.2); border-color: var(--yellow);
+      animation: diceLand 0.4s cubic-bezier(0.36,0.07,0.19,0.97);
+      font-size: 1.8em;
+    }
+    .dice-face.loser { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); opacity: 0.5; }
+    @keyframes diceShake {
+      0%   { transform: rotate(-8deg) scale(1.05); }
+      50%  { transform: rotate(8deg) scale(1.08); }
+      100% { transform: rotate(-8deg) scale(1.05); }
+    }
+    @keyframes diceLand {
+      0%   { transform: scale(1.4) rotate(-10deg); }
+      50%  { transform: scale(0.9) rotate(5deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .dice-vs { color: rgba(255,255,255,0.3); font-size: 0.75em; font-weight: 900; }
+    .playoff-score { font-size: 0.8em; color: rgba(255,255,255,0.4); min-width: 60px; text-align: right; }
+    .btn-confirm-ranking {
+      display: block; width: 100%; margin-top: 18px; padding: 14px;
+      background: linear-gradient(135deg, var(--green), #16a34a);
+      border: none; border-radius: 12px; color: #fff;
+      font-family: 'Fredoka One', cursive; font-size: 1.1em;
+      cursor: pointer; transition: all 0.2s; letter-spacing: 1px;
+    }
+    .btn-confirm-ranking:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(34,197,94,0.4); }
+    .btn-confirm-ranking:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .ranking-confirmed {
+      text-align: center; padding: 12px; border-radius: 10px;
+      background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3);
+      color: var(--green); font-weight: 900; font-size: 0.9em; margin-top: 12px;
+    }
+
     /* ── SPINNER ── */
     .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.15); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
     @keyframes spin { to{transform:rotate(360deg)} }
@@ -378,6 +441,66 @@
       0%   { transform: translateY(0) rotate(0deg);    opacity: 1; }
       100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
     }
+
+    /* ── DICE ROLL (form) ── */
+    .dice-section {
+      margin: 18px 0 10px; text-align: center;
+      padding: 18px; border-radius: 16px;
+      background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(59,130,246,0.08));
+      border: 2px dashed rgba(168,85,247,0.35);
+    }
+    .dice-section-title {
+      font-family:'Fredoka One',cursive; font-size:1em; color:var(--purple);
+      margin-bottom:14px; letter-spacing:1px;
+    }
+    .dice-trio { display:flex; gap:14px; justify-content:center; margin-bottom:14px; }
+    .d6 {
+      width:58px; height:58px; border-radius:12px;
+      background:rgba(255,255,255,0.08); border:2px solid rgba(255,255,255,0.18);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Fredoka One',cursive; font-size:1.6em; color:rgba(255,255,255,0.35);
+      transition:all 0.15s; user-select:none;
+    }
+    .d6.rolling {
+      animation:diceShake 0.08s linear infinite;
+      background:rgba(168,85,247,0.2); border-color:var(--purple); color:var(--purple);
+    }
+    .d6.landed {
+      background:rgba(255,211,61,0.15); border-color:var(--yellow); color:var(--yellow);
+      animation:diceLand 0.5s cubic-bezier(0.36,0.07,0.19,0.97) forwards;
+      font-size:1.9em;
+    }
+    @keyframes diceShake {
+      0%  { transform:rotate(-10deg) scale(1.08); }
+      50% { transform:rotate(10deg)  scale(1.12); }
+      100%{ transform:rotate(-10deg) scale(1.08); }
+    }
+    @keyframes diceLand {
+      0%  { transform:scale(1.5) rotate(-15deg); }
+      60% { transform:scale(0.88) rotate(5deg); }
+      100%{ transform:scale(1) rotate(0deg); }
+    }
+    .dice-sum {
+      font-family:'Fredoka One',cursive; font-size:1.3em;
+      color:var(--yellow); display:none; margin-bottom:8px;
+    }
+    .dice-hint { font-size:0.78em; color:rgba(255,255,255,0.35); }
+    .btn-roll {
+      padding:10px 28px; border-radius:999px;
+      background:linear-gradient(135deg,var(--purple),var(--blue));
+      border:none; color:#fff; font-family:'Fredoka One',cursive; font-size:1em;
+      cursor:pointer; transition:all 0.2s; letter-spacing:1px;
+    }
+    .btn-roll:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(168,85,247,0.4); }
+    .btn-roll:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+
+    /* ── LEADERBOARD dado column ── */
+    .lb-row { grid-template-columns: 36px 1fr 130px 54px 44px 52px; }
+    @media(max-width:600px){
+      .lb-row { grid-template-columns: 26px 1fr 90px 40px 36px 40px; }
+    }
+    .dice-col { font-size:0.8em; color:rgba(255,255,255,0.45); text-align:center; }
+    .dice-col.tie-broken { color:var(--orange); font-weight:900; }
 
     /* ── MOBILE ── */
     @media(max-width:600px){
@@ -462,8 +585,21 @@
 
       <div class="number-grid" id="numberGrid"></div>
 
+      <!-- DADO TIEBREAKER -->
+      <div class="dice-section" id="diceSection">
+        <div class="dice-section-title">🎲 LANCIA I DADI — serviranno in caso di pareggio</div>
+        <div class="dice-trio">
+          <div class="d6" id="d6a">?</div>
+          <div class="d6" id="d6b">?</div>
+          <div class="d6" id="d6c">?</div>
+        </div>
+        <div class="dice-sum" id="diceSum"></div>
+        <button class="btn-roll" id="btnRoll" onclick="rollDice()">🎲 Lancia i Dadi</button>
+        <div class="dice-hint" id="diceHint" style="margin-top:8px">Lancia prima di inviare — il totale (3-18) decide i pareggi domenica</div>
+      </div>
+
       <div class="alert alert-err" id="submitError"></div>
-      <button class="btn-play" id="submitBtn" disabled onclick="submitPicks()" data-i18n="btnPlay">🎲 GIOCA!</button>
+      <button class="btn-play" id="submitBtn" disabled onclick="submitPicks()" data-i18n="btnPlay">🎰 GIOCA!</button>
       <p style="text-align:center;font-size:0.75em;color:rgba(255,255,255,0.25);margin-top:10px" data-i18n="oneShot">Una sola giocata a settimana.</p>
     </div>
   </div>
@@ -566,6 +702,7 @@ var T = {
 var currentLang = localStorage.getItem('alliance_hub_lang') || 'it';
 var selectedNums = [], selectedJolly = null;
 var currentWeekId = null, currentDraw = null;
+var diceTotal = null, diceRolled = false;
 var CONFETTI_COLORS = ['#ff3b6b','#ffd93d','#a855f7','#3b82f6','#22c55e','#f97316','#ec4899'];
 
 function t(k){ return (T[currentLang]||T.en)[k] || (T.en[k]||k); }
@@ -726,7 +863,57 @@ function updateCounters(){
   jc.textContent='⭐ '+(selectedJolly!==null?1:0)+'/1';
   nc.classList.toggle('full',selectedNums.length===5);
   jc.classList.toggle('full',selectedJolly!==null);
-  document.getElementById('submitBtn').disabled=!(selectedNums.length===5&&selectedJolly!==null);
+  var ready=selectedNums.length===5&&selectedJolly!==null;
+  // Abilita GIOCA solo se anche i dadi sono stati lanciati
+  document.getElementById('submitBtn').disabled=!(ready&&diceRolled);
+  // Evidenzia sezione dadi quando i numeri sono completi
+  var ds=document.getElementById('diceSection');
+  if(ds) ds.style.borderColor=ready?'rgba(168,85,247,0.7)':'rgba(168,85,247,0.35)';
+}
+
+// ── DICE ROLL ──
+function rollDice(){
+  var ids=['d6a','d6b','d6c'];
+  var btn=document.getElementById('btnRoll');
+  btn.disabled=true;
+  var faces=['⚀','⚁','⚂','⚃','⚄','⚅'];
+  var results=[0,0,0];
+  var done=0;
+
+  ids.forEach(function(id,i){
+    var el=document.getElementById(id);
+    el.classList.remove('landed');
+    el.classList.add('rolling');
+    var ticks=0;
+    var maxTicks=18+(i*8); // ogni dado si ferma un po' dopo l'altro
+    var iv=setInterval(function(){
+      el.textContent=faces[Math.floor(Math.random()*6)];
+      ticks++;
+      if(ticks>=maxTicks){
+        clearInterval(iv);
+        var val=Math.floor(Math.random()*6)+1;
+        results[i]=val;
+        el.classList.remove('rolling');
+        el.classList.add('landed');
+        el.textContent=faces[val-1];
+        done++;
+        if(done===3){
+          // tutti e tre atterrati
+          diceTotal=results[0]+results[1]+results[2];
+          diceRolled=true;
+          var sumEl=document.getElementById('diceSum');
+          sumEl.textContent='Totale: '+diceTotal+' / 18';
+          sumEl.style.display='block';
+          document.getElementById('diceHint').textContent='✅ Dado registrato! Il tuo tiebreaker è '+diceTotal;
+          btn.textContent='🎲 Dado lanciato!';
+          btn.disabled=true;
+          btn.style.opacity='0.4';
+          btn.style.cursor='not-allowed';
+          updateCounters();
+        }
+      }
+    },60);
+  });
 }
 
 // ── ALREADY SUBMITTED ──
@@ -763,10 +950,10 @@ function submitPicks(){
   if(selectedNums.length!==5||selectedJolly===null){showErr(t('errNums'));return;}
   var btn=document.getElementById('submitBtn');
   btn.disabled=true; btn.dataset.busy='1'; btn.textContent=t('submitting');
-  gasPost({action:'saveSmorfiapicks',playerName:name,numbers:selectedNums.slice(),jolly:selectedJolly}).then(function(res){
+  gasPost({action:'saveSmorfiapicks',playerName:name,numbers:selectedNums.slice(),jolly:selectedJolly,diceTotal:diceTotal}).then(function(res){
     delete btn.dataset.busy;
     if(res.status==='success'){
-      var picks={numbers:selectedNums.slice(),jolly:selectedJolly,weekId:getWeekId()};
+      var picks={numbers:selectedNums.slice(),jolly:selectedJolly,diceTotal:diceTotal,weekId:getWeekId()};
       localStorage.setItem(LS_PICKS+getWeekId()+'_'+name,JSON.stringify(picks));
       localStorage.setItem(LS_NAME,name);
       launchConfetti();
@@ -809,11 +996,22 @@ function renderLeaderboard(data){
     show('winnerBox');
   } else { hide('winnerBox'); }
 
-  var html='<div class="lb-meta">WEEK: '+(data.weekId||currentWeekId)+' | '+entries.length+' players</div>';
-  html+='<div class="lb-row header"><span>#</span><span>Player</span><span>'+t('matchCol')+'</span><span>Score</span><span>'+t('jollyCol')+'</span></div>';
+  // Individua gruppi in pareggio (stesso matches + jollyMatched) per evidenziare il dado
+  var tiedGroups={};
+  if(drawn){
+    entries.forEach(function(e){
+      var key=e.matches+'-'+(e.jollyMatched?1:0);
+      tiedGroups[key]=(tiedGroups[key]||0)+1;
+    });
+  }
+
+  var html='<div class="lb-meta">WEEK: '+(data.weekId||currentWeekId)+' | '+entries.length+' giocatori</div>';
+  html+='<div class="lb-row header"><span>#</span><span>Player</span><span>'+t('matchCol')+'</span><span>Score</span><span>'+t('jollyCol')+'</span><span>🎲</span></div>';
 
   entries.forEach(function(e,i){
     var first=i===0&&drawn&&e.matches>0;
+    var key=e.matches+'-'+(e.jollyMatched?1:0);
+    var isTied=drawn&&tiedGroups[key]>1;
     html+='<div class="lb-row'+(first?' rank1':'')+'">'+
       '<div class="rank-ball'+(first?' gold':'')+'>'+(i+1)+'</div>'+
       '<div class="lb-name">'+esc(e.playerName)+'</div>'+
@@ -831,6 +1029,7 @@ function renderLeaderboard(data){
     html+='</div>'+
       '<div class="score-val'+(first?' top':'')+'">'+( drawn ? e.matches+'/5' : '—' )+'</div>'+
       '<div>'+(drawn?(e.jollyMatched?'<span class="jolly-tick">✓</span>':'<span style="color:rgba(255,255,255,0.15)">—</span>'):'<span style="color:rgba(255,255,255,0.15)">—</span>')+'</div>'+
+      '<div class="dice-col'+(isTied?' tie-broken':'')+'">'+(e.diceTotal!=null?'🎲'+e.diceTotal:'<span style="opacity:0.2">—</span>')+'</div>'+
       '</div>';
   });
   document.getElementById('lbContent').innerHTML=html;
