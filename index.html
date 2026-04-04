@@ -405,6 +405,39 @@
             filter: drop-shadow(0 18px 32px rgba(192, 132, 252, 0.22));
         }
 
+        .planner-card {
+            border-color: rgba(33, 150, 243, 0.3);
+        }
+        .card-link:hover .planner-card {
+            border-color: #2196f3;
+            box-shadow: 0 20px 60px rgba(33, 150, 243, 0.3);
+        }
+        .planner-card .card-icon {
+            filter: drop-shadow(0 18px 32px rgba(33, 150, 243, 0.22));
+        }
+
+        .server-card {
+            border-color: rgba(0, 188, 212, 0.3);
+        }
+        .card-link:hover .server-card {
+            border-color: #00bcd4;
+            box-shadow: 0 20px 60px rgba(0, 188, 212, 0.3);
+        }
+        .server-card .card-icon {
+            filter: drop-shadow(0 18px 32px rgba(0, 188, 212, 0.22));
+        }
+
+        .ammo-card {
+            border-color: rgba(244, 67, 54, 0.3);
+        }
+        .card-link:hover .ammo-card {
+            border-color: #f44336;
+            box-shadow: 0 20px 60px rgba(244, 67, 54, 0.3);
+        }
+        .ammo-card .card-icon {
+            filter: drop-shadow(0 18px 32px rgba(244, 67, 54, 0.22));
+        }
+
         .r4-modal {
             position: fixed;
             top: 0;
@@ -626,6 +659,15 @@
                 smorfiaTitle: 'Lotteria NGC',
                 smorfiaDesc: 'Gioca 5 numeri + jolly ogni settimana. Chi indovina di più diventa il Culone della Settimana!',
                 smorfiaBtn: 'Gioca Ora',
+                plannerTitle: 'Planner',
+                plannerDesc: 'Griglia SVG tattica con salvataggio locale, posizionamento palette e visuals da centro di comando.',
+                plannerBtn: 'Apri Planner',
+                serversTitle: 'Server Overview',
+                serversDesc: 'Lista server filtrabile con dataset locale, ordinamento client-side e preferenze salvate.',
+                serversBtn: 'Apri Overview',
+                ammoTitle: 'Ammo Bonanza',
+                ammoDesc: 'Simulazione browser con 5000 run, istogramma distribuzione, senza dipendenze backend.',
+                ammoBtn: 'Avvia Simulazione',
                 footerContact: 'Contatti:',
                 r4ErrorTitle: 'Codice R4 Non Valido',
                 r4ErrorMsg: 'Il codice R4 inserito non è corretto. Riprova.',
@@ -652,6 +694,15 @@
                 smorfiaTitle: 'Lotteria NGC',
                 smorfiaDesc: 'Pick 5 numbers + jolly every week. Best combo wins the Butt of the Week title!',
                 smorfiaBtn: 'Play Now',
+                plannerTitle: 'Planner',
+                plannerDesc: 'Tactical SVG grid with local persistence, palette placement and command-center visuals.',
+                plannerBtn: 'Open Planner',
+                serversTitle: 'Server Overview',
+                serversDesc: 'Filterable server list with local dataset, client-side sorting and saved preferences.',
+                serversBtn: 'Open Overview',
+                ammoTitle: 'Ammo Bonanza',
+                ammoDesc: 'Browser simulation with 5000 runs, distribution histogram and no backend dependency.',
+                ammoBtn: 'Run Simulation',
                 footerContact: 'Contacts:',
                 r4ErrorTitle: 'Invalid R4 Code',
                 r4ErrorMsg: 'The R4 code entered is incorrect. Try again.',
@@ -678,6 +729,15 @@
                 smorfiaTitle: 'Lotteria NGC',
                 smorfiaDesc: 'Joue 5 numéros + joker chaque semaine. Le meilleur gagne le titre de Gros Derrière!',
                 smorfiaBtn: 'Jouer Maintenant',
+                plannerTitle: 'Planificateur',
+                plannerDesc: 'Grille SVG tactique avec sauvegarde locale, placement de palette et visuels centre de commandement.',
+                plannerBtn: 'Ouvrir Planificateur',
+                serversTitle: 'Vue Serveurs',
+                serversDesc: 'Liste de serveurs filtrable avec données locales, tri côté client et préférences sauvegardées.',
+                serversBtn: 'Ouvrir Vue',
+                ammoTitle: 'Ammo Bonanza',
+                ammoDesc: 'Simulation navigateur avec 5000 tours, histogramme de distribution, sans dépendance backend.',
+                ammoBtn: 'Lancer Simulation',
                 footerContact: 'Contacts:',
                 r4ErrorTitle: 'Code R4 Invalide',
                 r4ErrorMsg: 'Le code R4 entré est incorrect. Réessayez.',
@@ -704,6 +764,15 @@
                 smorfiaTitle: 'Lotteria NGC',
                 smorfiaDesc: 'Tippe jede Woche 5 Zahlen + Joker. Die beste Kombination gewinnt den Hintern der Woche!',
                 smorfiaBtn: 'Jetzt Spielen',
+                plannerTitle: 'Planer',
+                plannerDesc: 'Taktisches SVG-Raster mit lokaler Speicherung, Palettenplatzierung und Kommandozentralen-Visuals.',
+                plannerBtn: 'Planer öffnen',
+                serversTitle: 'Server-Übersicht',
+                serversDesc: 'Filterbare Serverliste mit lokalem Datensatz, clientseitiger Sortierung und gespeicherten Einstellungen.',
+                serversBtn: 'Übersicht öffnen',
+                ammoTitle: 'Ammo Bonanza',
+                ammoDesc: 'Browser-Simulation mit 5000 Durchläufen, Verteilungshistogramm ohne Backend-Abhängigkeit.',
+                ammoBtn: 'Simulation starten',
                 footerContact: 'Kontakte:',
                 r4ErrorTitle: 'Ungültiger R4-Code',
                 r4ErrorMsg: 'Der eingegebene R4-Code ist falsch. Versuchen Sie es erneut.',
@@ -825,7 +894,7 @@
                     button: t.personalStatsBtn,
                     class: 'personal-stats-card',
                     locked: false,
-                    app: 'ngc-personal-stats'
+                    url: 'ngc-personal-stats.html'
                 },
                 {
                     iconSrc: 'assets/generated-icons/war-room-3d.png',
@@ -835,7 +904,7 @@
                     button: t.warRoomBtn,
                     class: 'war-room-card',
                     locked: false,
-                    app: 'war-room-defense-tracker'
+                    url: 'war-room-defense-tracker.html'
                 },
                 {
                     iconSrc: 'assets/generated-icons/strategy-3d.png',
@@ -845,7 +914,7 @@
                     button: t.canyonBtn,
                     class: 'canyon-card',
                     locked: true,
-                    app: 'strategy'
+                    url: 'alliance-strategy-ENHANCED.html'
                 },
                 {
                     iconSrc: 'assets/generated-icons/lottery-ngc-3d.png',
@@ -855,12 +924,42 @@
                     button: t.smorfiaBtn,
                     class: 'smorfia-card',
                     locked: false,
-                    app: 'smorfia-game'
+                    url: 'smorfia-game.html'
+                },
+                {
+                    iconSrc: 'assets/generated-icons/war-room-3d.png',
+                    iconAlt: 'Planner icon',
+                    title: t.plannerTitle,
+                    description: t.plannerDesc,
+                    button: t.plannerBtn,
+                    class: 'planner-card',
+                    locked: true,
+                    url: '../last-war-map-planner/maps/planner/'
+                },
+                {
+                    iconSrc: 'assets/generated-icons/servers-3d.png',
+                    iconAlt: 'Servers icon',
+                    title: t.serversTitle,
+                    description: t.serversDesc,
+                    button: t.serversBtn,
+                    class: 'server-card',
+                    locked: false,
+                    url: '../last-war-map-planner/servers/'
+                },
+                {
+                    iconSrc: 'assets/generated-icons/ammo-3d.png',
+                    iconAlt: 'Ammo icon',
+                    title: t.ammoTitle,
+                    description: t.ammoDesc,
+                    button: t.ammoBtn,
+                    class: 'ammo-card',
+                    locked: false,
+                    url: '../last-war-map-planner/events/ammo-bonanza/'
                 }
             ];
             
             container.innerHTML = cards.map(card => `
-                <a class="card-link" onclick="openApp('${card.app}', ${card.locked}); return false;" href="#">
+                <a class="card-link" onclick="openApp('${card.url}', ${card.locked}); return false;" href="#">
                     <div class="command-card ${card.class}">
                         ${card.locked ? '<div class="card-lock">🔒</div>' : ''}
                         <div class="card-icon"><img src="${card.iconSrc}" alt="${card.iconAlt}" loading="lazy"></div>
@@ -872,14 +971,14 @@
             `).join('');
         }
 
-        function openApp(app, locked) {
+        function openApp(url, locked) {
             if (locked) {
-                pendingR4App = app;
+                pendingR4App = url;
                 document.getElementById('r4Modal').classList.add('visible');
                 document.getElementById('r4CodeInput').value = '';
                 document.getElementById('r4CodeInput').focus();
             } else {
-                window.location.href = `${app}.html`;
+                window.location.href = url;
             }
         }
 
@@ -897,8 +996,7 @@
                 
                 if (data.status === 'success' && data.data.valid) {
                     sessionStorage.setItem('r4Code', code);
-                    const url = 'alliance-strategy-ENHANCED.html';
-                    window.location.href = url;
+                    window.location.href = pendingR4App;
                 } else {
                     alert(translations[currentLang].r4ErrorMsg);
                     document.getElementById('r4CodeInput').value = '';
