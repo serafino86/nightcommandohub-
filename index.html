@@ -845,7 +845,7 @@
                     button: t.canyonBtn,
                     class: 'canyon-card',
                     locked: true,
-                    app: 's5-map'
+                    app: 'strategy'
                 },
                 {
                     iconSrc: 'assets/generated-icons/lottery-ngc-3d.png',
@@ -897,10 +897,7 @@
                 
                 if (data.status === 'success' && data.data.valid) {
                     sessionStorage.setItem('r4Code', code);
-                    let url = 'alliance-strategy-ENHANCED.html';
-                    if (pendingR4App === 's5-map') {
-                        url = 'https://serafino86.github.io/s5mapngc/';
-                    }
+                    const url = 'alliance-strategy-ENHANCED.html';
                     window.location.href = url;
                 } else {
                     alert(translations[currentLang].r4ErrorMsg);
