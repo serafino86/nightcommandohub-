@@ -562,6 +562,110 @@
             color: var(--accent-color);
         }
 
+        .server-status {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 1rem;
+            padding: 14px 22px;
+            margin-bottom: 30px;
+            background: rgba(20, 35, 20, 0.85);
+            border: 1px solid rgba(76, 175, 80, 0.35);
+            border-radius: 14px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 1px rgba(76,175,80,0.08) inset;
+        }
+
+        .ss-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 72px;
+            padding: 8px 12px;
+            background: rgba(76,175,80,0.15);
+            border: 1px solid rgba(76,175,80,0.4);
+            border-radius: 10px;
+        }
+
+        .ss-state-label {
+            font-size: 0.62rem;
+            color: #7fa87a;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 2px;
+        }
+
+        .ss-state-value {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            letter-spacing: 0.08em;
+            line-height: 1;
+        }
+
+        .ss-body {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .ss-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .ss-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.14);
+            color: #d9e6d6;
+        }
+
+        .ss-chip.season { border-color: rgba(255,152,0,0.45); color: #ffb74d; }
+        .ss-chip.week   { border-color: rgba(76,175,80,0.45); color: #a5d6a7; }
+        .ss-chip.day    { border-color: rgba(118,255,3,0.5); color: var(--accent-color); background: rgba(118,255,3,0.08); }
+        .ss-chip.ally   { border-color: rgba(139,195,74,0.35); color: #c5e1a5; }
+
+        .ss-regions {
+            font-size: 0.72rem;
+            color: #7fa87a;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .ss-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 8px 14px;
+            border-radius: 9px;
+            border: 1px solid rgba(76,175,80,0.35);
+            background: rgba(76,175,80,0.1);
+            color: #a5d6a7;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.08em;
+            white-space: nowrap;
+            transition: all 0.25s;
+        }
+
+        .ss-link:hover {
+            background: rgba(76,175,80,0.22);
+            border-color: rgba(118,255,3,0.5);
+            color: var(--accent-color);
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2.5em;
@@ -575,6 +679,18 @@
                 position: static;
                 justify-content: center;
                 margin-bottom: 20px;
+            }
+
+            .server-status {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .ss-state {
+                flex-direction: row;
+                gap: 0.5rem;
+                min-width: 0;
+                width: fit-content;
             }
         }
     </style>
@@ -619,6 +735,23 @@
                 <h1 id="allianceName">COMMAND CENTER</h1>
                 <div class="subtitle" data-translate="subtitle">Centro di Comando dell'Alleanza</div>
                 <div class="alliance-tag" id="serverTag">CARICAMENTO...</div>
+            </div>
+
+            <div class="server-status" id="serverStatus">
+                <div class="ss-state">
+                    <span class="ss-state-label">State</span>
+                    <span class="ss-state-value">#1105</span>
+                </div>
+                <div class="ss-body">
+                    <div class="ss-row">
+                        <span class="ss-chip season" id="ss-season">Season —</span>
+                        <span class="ss-chip week" id="ss-week">Week —</span>
+                        <span class="ss-chip day" id="ss-day">Day —</span>
+                        <span id="ss-allies">…</span>
+                    </div>
+                    <div class="ss-regions" id="ss-regions">…</div>
+                </div>
+                <a class="ss-link" href="https://serafino86.github.io/s5mapngc/servers/" target="_blank">Servers ↗</a>
             </div>
 
             <div class="cards-container" id="cardsContainer"></div>
@@ -794,6 +927,66 @@
                 console.error('Init error:', error);
                 showError();
             }
+            loadServerStatus(); // non-blocking, runs in background
+        }
+
+        async function loadServerStatus() {
+            const SERVER_ID = '1105';
+            const CREATION_TS = 1731834001000; // State#1105 creation date
+
+            // Day counter — always computed from creation timestamp
+            const dayNum = Math.floor((Date.now() - CREATION_TS) / 86400000) + 1;
+            const dayEl = document.getElementById('ss-day');
+            if (dayEl) dayEl.textContent = 'Day ' + dayNum;
+
+            // Fetch season/week/regions from servers.json
+            try {
+                const srResp = await fetch('https://serafino86.github.io/s5mapngc/assets/data/servers.json');
+                const srData = await srResp.json();
+                const srv = srData.c.find(function(s) { return s.id === SERVER_ID; });
+                if (srv) {
+                    const seasonEl = document.getElementById('ss-season');
+                    const weekEl   = document.getElementById('ss-week');
+                    const regEl    = document.getElementById('ss-regions');
+                    if (seasonEl) seasonEl.textContent = 'Season ' + srv.currentSeason + (srv.isPostSeason ? ' PS' : '');
+                    if (weekEl)   weekEl.textContent   = 'Week ' + srv.currentWeek;
+                    if (regEl && srv.region && srv.region.length) {
+                        regEl.textContent = srv.region.map(function(r) {
+                            return r.charAt(0).toUpperCase() + r.slice(1);
+                        }).join(' · ');
+                    }
+                }
+            } catch(e) { console.warn('servers.json fetch failed', e); }
+
+            // Fetch live alliances from Google Sheet via GViz (public sheet, no auth needed)
+            try {
+                const sheetId = '1JWa6CzPfT2hRRKwv9zJCZ-nV5Xy9r1ydFf8YEPbO0KI';
+                const gvizUrl = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:json&gid=0';
+                const gvResp  = await fetch(gvizUrl);
+                const text    = await gvResp.text();
+                // GViz wraps response: /*O_o*/\ngoogle.visualization.Query.setResponse({...});
+                const raw     = text.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, '');
+                const gv      = JSON.parse(raw);
+                const rows    = gv.table.rows;
+
+                for (var ri = 0; ri < rows.length; ri++) {
+                    var row = rows[ri];
+                    if (!row.c || !row.c[0] || row.c[0].v == null) continue;
+                    if (String(row.c[0].v).trim() === SERVER_ID) {
+                        var alliances = [];
+                        for (var ci = 1; ci <= 10; ci++) {
+                            if (row.c[ci] && row.c[ci].v) alliances.push(String(row.c[ci].v).trim());
+                        }
+                        var alliesEl = document.getElementById('ss-allies');
+                        if (alliesEl) {
+                            alliesEl.innerHTML = alliances.map(function(a) {
+                                return '<span class="ss-chip ally">' + a + '</span>';
+                            }).join('');
+                        }
+                        break;
+                    }
+                }
+            } catch(e) { console.warn('GViz fetch failed', e); }
         }
 
         async function loadConfig() {
