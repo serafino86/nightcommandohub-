@@ -806,9 +806,12 @@ function loadDraw(){
   show('drawLoading'); hide('drawFound'); hide('drawNone');
   gasGet('getWeeklyDraw').then(function(res){
     hide('drawLoading');
-    if(res.status==='success'&&res.data&&res.data.numbers){
-      currentDraw=res.data; renderDraw(res.data); show('drawFound');
-    } else { show('drawNone'); }
+    var drawData=normalizeDrawData(res&&res.data);
+    if(drawData){
+      currentDraw=drawData; renderDraw(drawData); show('drawFound');
+    } else {
+      show('drawNone');
+    }
     var name=document.getElementById('playerNameInput').value.trim();
     if(name) checkAlreadySubmitted(name);
     loadLeaderboard();
@@ -823,6 +826,22 @@ function renderDraw(data){
   });
   c.innerHTML+='<div class="draw-sep">|</div>';
   c.innerHTML+='<div class="ball-wrap"><div class="draw-ball jolly" style="animation-delay:0.6s">'+data.jolly+'</div><div class="draw-ball-label">'+t('jollyCol')+'</div></div>';
+}
+
+function normalizeDrawData(data){
+  if(!data||typeof data!=='object') return null;
+  var numbers=Array.isArray(data.numbers)?data.numbers:Array.isArray(data.drawnNumbers)?data.drawnNumbers:null;
+  var jolly=data.jolly!=null?data.jolly:data.drawnJolly;
+  if(!Array.isArray(numbers)||numbers.length<5||jolly==null) return null;
+  var cleanNumbers=numbers.slice(0,5).map(function(n){ return +n; }).filter(function(n){ return !isNaN(n)&&n>0; });
+  var cleanJolly=+jolly;
+  if(cleanNumbers.length!==5||isNaN(cleanJolly)||cleanJolly<=0) return null;
+  return {
+    weekId:data.weekId||currentWeekId,
+    numbers:cleanNumbers,
+    jolly:cleanJolly,
+    timestamp:data.timestamp||null
+  };
 }
 
 // ── GRID ──
@@ -988,6 +1007,15 @@ function loadLeaderboard(){
   gasGet('getSmorfiaLeaderboard').then(function(res){
     lbL.style.display='none';
     if(res.status==='success'&&res.data&&res.data.entries&&res.data.entries.length){
+      if(!currentDraw){
+        var drawFromLeaderboard=normalizeDrawData(res.data);
+        if(drawFromLeaderboard){
+          currentDraw=drawFromLeaderboard;
+          hide('drawNone');
+          renderDraw(drawFromLeaderboard);
+          show('drawFound');
+        }
+      }
       renderLeaderboard(res.data);
     } else {
       lbC.innerHTML='<div class="lb-empty">'+t('lbEmpty')+'</div>';
