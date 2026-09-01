@@ -980,7 +980,7 @@
 
             // Fetch season/week/regions from servers.json
             try {
-                const srResp = await fetch('https://serafino86.github.io/lwmap/assets/data/servers.json');
+                const srResp = await fetch('https://serafino86.github.io/lwmap/assets/data/servers.json', { cache: 'no-cache' });
                 const srData = await srResp.json();
                 const srv = srData.c.find(function(s) { return s.id === SERVER_ID; });
                 if (srv) {
