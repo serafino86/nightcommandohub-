@@ -778,7 +778,7 @@
                     </div>
                     <div class="ss-regions" id="ss-regions">…</div>
                 </div>
-                <a class="ss-link" href="https://serafino86.github.io/s5mapngc/servers/" target="_blank">Servers ↗</a>
+                <a class="ss-link" href="https://serafino86.github.io/lwmap/servers/" target="_blank">Servers ↗</a>
             </div>
 
             <div class="cards-container" id="cardsContainer"></div>
@@ -980,7 +980,7 @@
 
             // Fetch season/week/regions from servers.json
             try {
-                const srResp = await fetch('https://serafino86.github.io/s5mapngc/assets/data/servers.json');
+                const srResp = await fetch('https://serafino86.github.io/lwmap/assets/data/servers.json');
                 const srData = await srResp.json();
                 const srv = srData.c.find(function(s) { return s.id === SERVER_ID; });
                 if (srv) {
@@ -1167,7 +1167,7 @@
                     class: 'ncf-card',
                     locked: false,
                     external: true,
-                    url: 'https://serafino86.github.io/s5mapngc/'
+                    url: 'https://serafino86.github.io/lwmap/'
                 }
             ];
             
